@@ -1,0 +1,107 @@
+<?php
+session_start();
+include '../config/database.php';
+$error_message = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = $_POST['username']; 
+    $password = $_POST['password'];
+
+    $sql = "SELECT id_pengguna, nama_lengkap, kata_sandi_hash, peran 
+            FROM pengguna 
+            WHERE nama_lengkap = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $username); 
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $user = $result->fetch_assoc();
+        $hash = $user['kata_sandi_hash'];
+
+        // cek password: hash atau plaintext
+        if (
+            (!empty($hash) && password_verify($password, $hash)) || 
+            $password === $hash
+        ) {
+            $_SESSION['user_id']   = $user['id_pengguna'];
+            $_SESSION['username']  = $user['nama_lengkap'];
+            $_SESSION['user_peran']= $user['peran']; 
+
+            if ($user['peran'] === 'admin') {
+                header('Location: ../admin/index.php');
+                exit;
+            } else {
+                header('Location: ../simaksi/index.php');
+                exit;
+            }
+        } else {
+            $error_message = "Username atau password salah.";
+        }
+    } else {
+        $error_message = "Username atau password salah.";
+    }
+
+    $stmt->close();
+    $conn->close();
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-SIMAKSI - Login</title>
+    <link rel="stylesheet" href="../assets/css/auth.css">
+</head>
+<body>
+    <div class="container">
+        <div class="left-section">
+            <h1>SELAMAT DATANG DI <br> GUNUNG BUTAK</h1>
+            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestiae eum optio debitis fugiat ad, suscipit tenetur totam labore possimus beatae itaque accusantium soluta libero quos recusandae obcaecati voluptatum temporibus enim?</p>
+        </div>
+
+        <div class="right-section">
+            <div class="login-box">
+                <div class="logo">
+                    <img src="../assets/images/logo1.png" alt="E-SIMAKSI Logo">
+                </div>
+                <h2>LOGIN</h2>
+                <p>Yuk login sekarang, biar cerita pendakianmu di Butak resmi dimulai</p>
+                
+        <form action="login.php" method="POST">
+            <div class="input-group floating-label">
+                <input type="text" name="username" id="username" required placeholder=" ">
+                <label for="username">Username</label>
+                <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="6" r="4" fill="currentColor"/><path fill="currentColor" d="M20 17.5c0 2.485 0 4.5-8 4.5s-8-2.015-8-4.5S7.582 13 12 13s8 2.015 8 4.5"/>
+                </svg>
+            </div>
+
+            <div class="input-group floating-label">
+                <input type="password" id="password" name="password" placeholder=" " autocomplete="new-password" required>
+                <label for="password">Password</label>
+                <span class="input-icon toggle-password" tabindex="0" role="button" aria-label="Toggle password visibility">
+                    <svg id="eye-open" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12 9a3 3 0 0 1 3 3a3 3 0 0 1-3 3a3 3 0 0 1-3-3a3 3 0 0 1 3-3m0-4.5c5 0 9.27 3.11 11 7.5c-1.73 4.39-6 7.5-11 7.5S2.73 16.39 1 12c1.73-4.39 6-7.5 11-7.5M3.18 12a9.821 9.821 0 0 0 17.64 0a9.821 9.821 0 0 0-17.64 0"/></svg>
+                    <svg id="eye-close" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M2 5.27L3.28 4L20 20.72L18.73 22l-3.08-3.08c-1.15.38-2.37.58-3.65.58c-5 0-9.27-3.11-11-7.5c.69-1.76 1.79-3.31 3.19-4.54zM12 9a3 3 0 0 1 3 3a3 3 0 0 1-.17 1L11 9.17A3 3 0 0 1 12 9m0-4.5c5 0 9.27 3.11 11 7.5a11.8 11.8 0 0 1-4 5.19l-1.42-1.43A9.86 9.86 0 0 0 20.82 12A9.82 9.82 0 0 0 12 6.5c-1.09 0-2.16.18-3.16.5L7.3 5.47c1.44-.62 3.03-.97 4.7-.97M3.18 12A9.82 9.82 0 0 0 12 17.5c.69 0 1.37-.07 2-.21L11.72 15A3.064 3.064 0 0 1 9 12.28L5.6 8.87c-.99.85-1.82 1.91-2.42 3.13"/></svg>    
+                </span>
+            </div>
+
+            <!-- Checkbox Ingat saya dan Lupa password -->
+            <div class="remember-forgot">
+                <label><input type="checkbox" name="remember"> Ingat saya</label>
+                <a href="forgot_password.php">Lupa password?</a>
+            </div>
+
+            <button type="submit" class="login-btn">Login</button>
+        </form>
+
+        <p class="register-link">Belum punya akun? <a href="../auth/register.php">Register</a></p>
+            </div>
+        </div>
+    </div>
+
+<script src="../assets/js/auth.js"></script>  
+
+</body>
+</html>

@@ -1,0 +1,191 @@
+@import url("https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap");
+
+* {
+  font-family: "Ubuntu", sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --background: #35542E;
+  --sidebar-bg: #35542E;
+  --main-bg: #ffffff;
+  --text-color: #fff;
+  --hover-bg: #fff;
+  --hover-text: #35542E;
+  --curve-color: #fff;
+}
+
+body {
+  min-height: 100vh;
+  height: 100%;
+  overflow-x: hidden;
+}
+
+.container {
+  position: relative;
+  width: 100%;
+}
+
+.navigation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 260px;             
+  height: 100vh;           
+  background: var(--sidebar-bg);
+  transition: 0.5s;
+  overflow: hidden;
+  border-top-right-radius: 50px;
+  border-bottom-right-radius: 50px;
+  flex-shrink: 0;
+}
+
+.navigation.active {
+  width: 80px;
+}
+
+.navigation.active ul li a .title {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.navigation ul {
+  position: relative;
+  width: 100%;
+  padding: 20px 0;
+}
+
+.navigation ul li {
+  position: relative;
+  width: 100%;
+  list-style: none;
+  border-top-left-radius: 30px;
+  border-bottom-left-radius: 30px;
+}
+
+.navigation ul li:hover,
+.navigation ul li.hovered {
+  background-color: var(--hover-bg);
+}
+
+.navigation ul li:nth-child(1) {
+  margin-bottom: 40px;
+  pointer-events: none;
+}
+
+.navigation ul li a {
+  position: relative;
+  align-items: center; 
+  gap: 10px;   
+  display: block;
+  width: 100%;
+  display: flex;
+  text-decoration: none;
+  color: var(--text-color);
+}
+
+.navigation ul li:hover a,
+.navigation ul li.hovered a {
+  color: var(--hover-text);
+}
+
+.navigation ul li.active {
+  background-color: var(--hover-bg);
+}
+.navigation ul li.active a {
+  color: var(--hover-text);
+}
+
+.navigation ul li a .logo-img {
+  position: relative;
+  display: block;
+  min-width: 60px;
+  height: 60px;
+  line-height: 75px;
+  margin-left: 10px;
+  text-align: center;
+}
+
+.navigation ul li a.toggle:hover {
+  color: var(--hover-text);
+  background-color: var(--hover-bg);
+  border-radius: 30px;
+}
+
+.navigation ul li a .icon {
+  position: relative;
+  display: block;
+  min-width: 50px;
+  height: 50px;
+  line-height: 65px;
+  padding: 0 20px;
+  text-align: center;
+}
+
+.navigation ul li a .title {
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+/* --------- curve outside ---------- */
+.navigation ul li:hover a::before,
+.navigation ul li.hovered a::before {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: -50px;
+  width: 50px;
+  height: 50px;
+  background-color: transparent;
+  border-radius: 50%;
+  box-shadow: 35px 35px 0 10px var(--curve-color);
+  pointer-events: none;
+}
+.navigation ul li:hover a::after,
+.navigation ul li.hovered a::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: -50px;
+  width: 50px;
+  height: 50px;
+  background-color: transparent;
+  border-radius: 50%;
+  box-shadow: 35px -35px 0 10px var(--curve-color);
+  pointer-events: none;
+}
+
+.main.active .topbar {
+  left: 80px;
+  width: calc(100% - 80px);
+}
+
+.main {
+  flex: 1;
+  position: absolute;
+  width: calc(100% - 260px);
+  left: 260px;
+  min-height: 100vh;
+  height: 100vh;
+  background: var(--text-color);
+  transition: 0.5s;
+  padding: 15px;
+  overflow-y: auto; 
+}
+
+.main.active {
+  width: calc(100% - 80px);
+  left: 80px;
+}
+
+.toggle {
+  font-size: 2rem;
+  cursor: pointer;
+
+}
