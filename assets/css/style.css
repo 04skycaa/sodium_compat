@@ -15,6 +15,11 @@
   --hover-bg: #fff;
   --hover-text: #35542E;
   --curve-color: #fff;
+  --green-pastel: #75B368;
+  --green-bg: #35542E;
+  --grey-bg: #D9D9D9;
+  --blue: #7680EF;
+  --red: #E74C3C;
 }
 
 body {
@@ -188,4 +193,439 @@ body {
   font-size: 2rem;
   cursor: pointer;
 
+}
+
+/* tampilan untuk menu*/
+.keuangan-container {
+  background: #fff;
+  padding: 25px;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  animation: fadeIn 0.6s ease-out;
+}
+
+/* Header */
+.keuangan-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.keuangan-header h2 {
+  color: var(--hover-text);
+  font-size: 1.5rem;
+}
+
+.right-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.right-controls .btn {
+  padding: 8px 12px;
+  font-size: 0.9rem;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  background: var(--grey-bg);
+  border-radius: 20px;
+  padding: 5px 10px;
+}
+
+.search-box input {
+  padding: 8px 12px;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  transition: 0.3s;
+}
+.search-box input:focus {
+  border-color: var(--hover-text);
+  box-shadow: 0 0 5px rgba(53,84,46,0.3);
+}
+
+/* Cards */
+.status-bar {
+  display: flex;
+  gap: 15px;
+  margin: 25px 0;
+  flex-wrap: wrap;
+}
+.card {
+  flex: 1;
+  min-width: 180px;
+  padding: 15px;
+  text-align: center;
+  border-radius: 12px;
+  color: white;
+  font-weight: 500;
+  transition: transform 0.4s ease, box-shadow 0.3s;
+}
+.card span {
+  display: block;
+  font-size: 1.2rem;
+  margin-top: 6px;
+}
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+}
+.card.green { background: var(--background); }
+.card.red { background: var(--red); }
+.card.blue { background: var(--blue); }
+.card.dark { background: var(--green-pastel); 
+}
+
+.filter-section {
+  display: flex;
+  gap: 15px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  margin: 20px 0;
+  justify-content: flex-end;
+}
+
+
+.filter-section .filter-btn {
+  background: var(--hover-text) !important;
+  color: white !important;
+  padding: 8px 16px !important;
+  border-radius: 10px !important;
+  font-weight: 500;
+  border: none !important;
+  cursor: pointer;
+  transition: 0.3s ease !important;
+}
+
+.filter-section .filter-btn:hover {
+  background: var(--background) !important;
+  transform: translateY(-2px);
+}
+
+
+.filter-section input,
+.filter-btn {
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+.filter-btn {
+  background: var(--hover-text);
+  color: white;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.filter-btn:hover {
+  background: var(--background);
+}
+
+/* Table */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fdfdfd;
+}
+.data-table th, .data-table td {
+  padding: 10px;
+  border-bottom: 1px solid #e0e0e0;
+  text-align: left;
+}
+.data-table tr:hover {
+  background-color: #eaf7ea;
+  transition: 0.3s;
+}
+
+/* Buttons */
+.action-bar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 15px;
+}
+.btn {
+  padding: 8px 15px;
+  border-radius: 8px;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s;
+  font-weight: 500;
+}
+.btn.green { background: var(--hover-text); }
+.btn.red { background: var(--red); }
+.btn.blue { background: var(--blue); }
+.btn.dark { background: var(--background); }
+.btn:hover {
+  opacity: 0.85;
+  transform: scale(1.05);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* pop up */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+.modal-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    width: 420px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 22px;
+    cursor: pointer;
+    color: #444;
+}
+.close-btn:hover {
+    color: #000;
+}
+
+/* untuk tambah pengeluaran */
+.form-container {
+  max-width: 420px;
+  margin: 60px auto;
+  background: #f2f2f2;
+  padding: 35px 25px;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  animation: fadeIn 0.6s ease-out;
+}
+
+.form-container h2 {
+  text-align: center;
+  color: #35542E;
+  margin-bottom: 20px;
+}
+
+.input-group {
+  position: relative;
+  margin-bottom: 22px;
+}
+
+.input-group input,
+.input-group select,
+.input-group textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 2px solid #35542E;
+  border-radius: 12px;
+  outline: none;
+  font-size: 1rem;
+  background: transparent;
+  transition: 0.3s;
+}
+
+.input-group textarea {
+  height: 80px;
+  resize: none;
+}
+
+.input-group label {
+  position: absolute;
+  top: 12px;
+  left: 14px;
+  color: #35542E;
+  pointer-events: none;
+  transition: 0.3s;
+  background: #f2f2f2;
+  padding: 0 4px;
+}
+
+/* animasi floating label */
+.input-group input:focus + label,
+.input-group input:not(:placeholder-shown) + label,
+.input-group select:focus + label,
+.input-group select:not([value=""]) + label,
+.input-group textarea:focus + label,
+.input-group textarea:not(:placeholder-shown) + label {
+  top: -9px;
+  left: 10px;
+  font-size: 0.85rem;
+  color: #35542E;
+  font-weight: 600;
+}
+
+button {
+  padding: 10px;
+  background: #35542E;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover {
+  background: #2a4425;
+  transform: translateY(-2px);
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  background: white;
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14px;
+}
+
+thead {
+  background-color: var(--background);
+  color: white;
+}
+
+th, td {
+  padding: 10px 15px;
+  border-bottom: 1px solid #ddd;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+tbody tr:hover {
+  background-color: #f2f2f2;
+}
+
+td {
+  max-width: 200px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+/* animasi  edit user */
+.form-container {
+  animation: slideIn 0.8s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* aopup konfirmasi hapus */
+.confirm-box {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  z-index: 1000;
+}
+
+.confirm-box.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.confirm-content {
+  background: #fff;
+  padding: 25px;
+  border-radius: 15px;
+  text-align: center;
+  width: 340px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  transform: scale(0.8);
+  animation: popIn 0.4s ease forwards;
+}
+
+.confirm-content h3 {
+  color: #35542E;
+  margin-bottom: 10px;
+}
+
+.confirm-content p {
+  font-size: 0.95rem;
+  color: #444;
+  margin-bottom: 20px;
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* animasi buat pop up atau modal */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* Jangan blokir efek SweetAlert */
+.swal2-popup {
+  font-family: 'Poppins', sans-serif;
+  border-radius: 12px;
+  animation-duration: 0.4s;
+}
+
+/* Opsional tambahan efek halus */
+.swal2-icon.swal2-success {
+  animation: scaleUp 0.4s ease;
+}
+
+@keyframes scaleUp {
+  from {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
