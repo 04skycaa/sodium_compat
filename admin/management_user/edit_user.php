@@ -1,7 +1,7 @@
 <?php 
 include '../../config/database.php';
+header('X-Content-Type-Options: nosniff');
 
-// Ambil data pengguna berdasarkan ID
 $id = isset($_GET['id']) ? $_GET['id'] : '';
 
 if ($id) {
@@ -19,17 +19,17 @@ if ($id) {
     exit;
 }
 
-// Variabel notifikasi
-$notif = '';
-
-// Proses update data
+// Jika ada request POST dari fetch()
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    header('Content-Type: application/json; charset=utf-8');
+
+    $id = $_POST['id_pengguna'];
     $nama_lengkap = $_POST['nama_lengkap'];
     $email = $_POST['email'];
     $nomor_telepon = $_POST['nomor_telepon'];
     $alamat = $_POST['alamat'];
     $peran = $_POST['peran'];
-    $dibuat_pada = $_POST['dibuat_pada'];
+    $dibuat_pada = $_POST['dibuat_pada'] ?? date('Y-m-d H:i:s');
 
     $update = "UPDATE pengguna SET 
         nama_lengkap='$nama_lengkap', 
@@ -41,23 +41,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         WHERE id_pengguna='$id'";
 
     if ($conn->query($update)) {
-        $notif = 'success';
+        echo json_encode(['status' => 'success', 'message' => 'Data pengguna berhasil diperbarui!']);
     } else {
-        $notif = 'failed';
+        echo json_encode(['status' => 'error', 'message' => 'Gagal memperbarui data.', 'error' => $conn->error]);
     }
+    exit;
 }
 ?>
-
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <title>Edit Data User</title>
-  <link rel="stylesheet" href="../../assets/css/style.css">
-  <!-- Tambahkan SweetAlert2 -->
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-</head>
-<body>
 
 <div class="form-container">
   <h2>Edit Data User</h2>
@@ -97,7 +87,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </form>
 </div>
 
-<script src="../../assets/js/edit_user.js"></script>
-</body>
-</html>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.getElementById('editUserForm').addEventListener('submit', async function (e) {
+  e.preventDefault();
+  const form = e.target;
 
+  try {
+    const res = await fetch('edit_user.php?id=<?= $user['id_pengguna']; ?>', {
+      method: 'POST',
+      body: new FormData(form)
+    });
+
+    const json = await res.json();
+
+    if (json.status === 'success') {
+      Swal.fire({
+        icon: 'success',
+        title: json.message,
+        showConfirmButton: false,
+        timer: 1200
+      }).then(() => {
+        window.location.href = 'management_user.php';
+      });
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: 'Gagal',
+        text: json.message + (json.error ? ' (' + json.error + ')' : '')
+      });
+    }
+  } catch (err) {
+    console.error(err);
+    Swal.fire({
+      icon: 'error',
+      title: 'Kesalahan',
+      text: 'Terjadi kesalahan jaringan atau server.'
+    });
+  }
+});
+</script>
