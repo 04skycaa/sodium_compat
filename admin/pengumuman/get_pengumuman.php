@@ -1,6 +1,6 @@
 <?php
 header('Content-Type: application/json');
-include __DIR__ . '/../../../config/supabase.php';
+include __DIR__ . '/../../config/supabase.php';
 
 if (!isset($_GET['id'])) {
     echo json_encode(['success' => false, 'message' => 'ID tidak ditemukan.']);

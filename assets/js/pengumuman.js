@@ -12,18 +12,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const endDateInput = document.getElementById('end_date');
     const terbitCheckbox = document.getElementById('telah_terbit');
 
-    // fungsi untuk menampilkan dan menyembunyikan modal
+    // untuk menampilkan dan menyembunyikan modal
     function showModal() {
-        modalOverlay.style.display = 'flex';
-        modalContainer.classList.add('animate__fadeInDown');
-        modalContainer.classList.remove('animate__fadeOutUp');
+        modalOverlay.classList.add('show');
     }
     function hideModal() {
-        modalContainer.classList.remove('animate__fadeInDown');
-        modalContainer.classList.add('animate__fadeOutUp');
-        setTimeout(() => { modalOverlay.style.display = 'none'; }, 500);
-    }
-    
+    modalOverlay.classList.remove('show');
+}
     // tombol "Buat Pengumuman Baru"
     document.getElementById('btn-tambah-pengumuman').addEventListener('click', () => {
         form.reset();
@@ -31,12 +26,14 @@ document.addEventListener('DOMContentLoaded', function() {
         modalTitle.textContent = 'Buat Pengumuman Baru';
         showModal();
     });
-
+    
     // tombol "Edit" di setiap baris
     document.querySelectorAll('.btn-edit').forEach(button => {
         button.addEventListener('click', function() {
+            console.log('Tombol edit diklik! ID:', this.dataset.id);
             const id = this.dataset.id;
-            fetch(`pengumuman/actions/get_pengumuman.php?id=${id}`)
+            
+            fetch(`pengumuman/get_pengumuman.php?id=${id}`) 
                 .then(response => response.json())
                 .then(res => {
                     if (res.success) {
@@ -52,6 +49,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     } else {
                         Swal.fire('Gagal!', res.message, 'error');
                     }
+                })
+                .catch(err => {
+                    console.error('Error saat fetch data edit:', err);
+                    Swal.fire('Error!', 'Gagal mengambil data. Cek console.', 'error');
                 });
         });
     });
@@ -59,6 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // tombol "Hapus"
     document.querySelectorAll('.btn-hapus').forEach(button => {
         button.addEventListener('click', function() {
+            console.log('Tombol hapus diklik! ID:', this.dataset.id);
             const id = this.dataset.id;
             Swal.fire({
                 title: 'Apakah Anda yakin?',
@@ -70,7 +72,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 confirmButtonText: 'Ya, hapus!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    fetch('pengumuman/actions/proses_pengumuman.php', {
+                    
+                    // PERBAIKAN 2: Path diubah (menghapus /actions/)
+                    fetch('pengumuman/proses_pengumuman.php', {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify({ action: 'delete', id: id })
@@ -104,7 +108,8 @@ document.addEventListener('DOMContentLoaded', function() {
             telah_terbit: terbitCheckbox.checked
         };
         
-        fetch('pengumuman/actions/proses_pengumuman.php', {
+        // PERBAIKAN 3: Path diubah (menghapus /actions/)
+        fetch('pengumuman/proses_pengumuman.php', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(formData)
