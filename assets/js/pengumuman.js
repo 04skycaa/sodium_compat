@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     function hideModal() {
     modalOverlay.classList.remove('show');
-}
+    }
     // tombol "Buat Pengumuman Baru"
     document.getElementById('btn-tambah-pengumuman').addEventListener('click', () => {
         form.reset();

@@ -89,9 +89,28 @@ function format_rupiah($number) {
 <div class="menu-container">
     <div class="menu-header"><h2>Keuangan</h2></div>
     <div class="status-bar">
-        <div class="card green"><span class="icon"><i class="fa-solid fa-arrow-down"></i></span>Keuntungan<span class="value"><?= format_rupiah($total_keuntungan) ?></span></div>
-        <div class="card red"><span class="icon"><i class="fa-solid fa-arrow-up"></i></span>Pengeluaran<span class="value"><?= format_rupiah($total_pengeluaran) ?></span></div>
-        <div class="card blue"><span class="icon"><i class="fa-solid fa-wallet"></i></span>Saldo Akhir<span class="value"><?= format_rupiah($saldo_akhir) ?></span></div>
+        <div class="card green">
+            <span class="icon">
+                <i class="fa-solid fa-arrow-down"></i>
+            </span>
+            Keuntungan
+            <span class="value"><?= format_rupiah($total_keuntungan) ?></span>
+        </div>
+        <div class="card red">
+            <span class="icon">
+                <i class="fa-solid fa-arrow-up"></i>
+            </span>
+            Pengeluaran
+            <span class="value"><?= format_rupiah($total_pengeluaran) ?></span>
+        </div>
+        <div class="card blue">
+            <span class="icon"><i class="fa-solid fa-wallet">
+                </i>
+            </span>
+            Saldo Akhir
+            <span class="value"><?= format_rupiah($saldo_akhir) ?></span>
+        </div>
+
         <div class="card soft-green"><span class="icon"><i class="fa-solid fa-list-ol"></i></span>Total Transaksi<span class="value"><?= $jumlah_transaksi ?></span></div>
     </div>
 
