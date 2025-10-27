@@ -1,271 +1,189 @@
-document.addEventListener('DOMContentLoaded', function() {
+/**
+ * FILE: reservasi.js
+ *
+ * Menggabungkan logika untuk tampilan Reservasi utama dan formulir Tambah Reservasi
+ */
 
-    // elemen modal validasi reservasi
-    const modalValidasi = document.querySelector('#modal-validasi');
-    const modalValidasiBody = modalValidasi ? modalValidasi.querySelector('.modal-body') : null;
-    const modalValidasiCloseBtn = modalValidasi ? modalValidasi.querySelector('.modal-close-btn') : null;
+// =================================================================================
+// 1. LOGIKA UTAMA FORMULIR TAMBAH RESERVASI (Dipanggil setelah konten dimuat via AJAX)
+// =================================================================================
 
-    // elemen modal tambah reservasi
-    const modalTambah = document.querySelector('#modal-tambah');
-    const modalTambahCloseBtn = modalTambah ? modalTambah.querySelector('.modal-close-btn') : null;
-    const btnTambahReservasi = document.querySelector('#btn-tambah-reservasi');
-    const formTambahReservasi = document.querySelector('#form-tambah-reservasi');
+window.initializeTambahReservasiLogic = function() {
+    const form = document.getElementById('form-tambah-reservasi');
+    if (!form) return; 
 
-    let currentReservasiId = null;
+    // --- Variabel Form (Menggunakan optional chaining untuk keamanan jika tersedia) ---
+    const totalHargaDisplay = document.getElementById('total-harga-display');
+    const totalHargaInput = document.getElementById('total-harga-input');
+    const inputJumlahPendaki = document.getElementById('add_jumlah_pendaki');
+    const inputJumlahParkir = document.getElementById('add_jumlah_tiket_parkir');
+    const tableBody = document.querySelector('#rincian-sampah-table tbody');
+    const btnTambahBarang = document.getElementById('btn-tambah-barang');
+    const btnResetForm = document.getElementById('btn-reset-form');
+    const inputRincianSampahJson = document.getElementById('rincian-sampah-json');
 
-    // fungsi untuk menampilkan dan menyembunyikan modal validasi
-    function showValidasiModal() {
-        if (modalValidasi) modalValidasi.classList.add('show');
+    let rincianSampah = [];
+    const HARGA_PENDAKI = 10000; 
+    const HARGA_PARKIR = 5000;  
+    const submitEndpoint = 'proses_reservasi.php'; 
+
+    // --- Fungsi Helper ---
+    function formatRupiah(number) { return 'Rp ' + number.toLocaleString('id-ID'); }
+
+    function hitungTotalHarga() {
+        // Menggunakan optional chaining (?) dan nullish coalescing (||) untuk keamanan
+        const pendaki = parseInt(inputJumlahPendaki?.value) || 0; 
+        const parkir = parseInt(inputJumlahParkir?.value) || 0;
+        const total = (pendaki * HARGA_PENDAKI) + (parkir * HARGA_PARKIR);
+        if(totalHargaDisplay) totalHargaDisplay.textContent = formatRupiah(total);
+        if(totalHargaInput) totalHargaInput.value = total;
     }
-    function hideValidasiModal() {
-        if (modalValidasi) {
-             modalValidasi.classList.remove('show');
-             if(modalValidasiBody) modalValidasiBody.innerHTML = '<p>Loading...</p>';
-             currentReservasiId = null;
+
+    function renderRincianSampah() {
+        if (!tableBody) return;
+        tableBody.innerHTML = '';
+        rincianSampah.forEach((item, index) => {
+            const row = tableBody.insertRow();
+            row.innerHTML = `
+                <td>${item.nama}</td>
+                <td>${item.jenis}</td>
+                <td>${item.jumlah}</td>
+                <td>
+                    <button type="button" class="btn red" style="padding: 5px 10px; font-size: 0.8rem;" onclick="window.hapusBarang(${index})"><i class="fa-solid fa-trash-can"></i> Hapus</button>
+                </td>
+            `;
+        });
+        if(inputRincianSampahJson) inputRincianSampahJson.value = JSON.stringify(rincianSampah);
+    }
+
+    // --- Global Functions (diperlukan untuk tombol Hapus di tabel yang dimuat dinamis) ---
+    window.hapusBarang = function(index) {
+        rincianSampah.splice(index, 1);
+        renderRincianSampah();
+    };
+
+    // --- Event Listeners Form Logic ---
+    if (btnTambahBarang) btnTambahBarang.addEventListener('click', function() {
+        const nama = document.getElementById('rincian_nama_barang')?.value.trim();
+        const jenis = document.getElementById('rincian_jenis_sampah')?.value;
+        const jumlah = parseInt(document.getElementById('rincian_jumlah')?.value) || 0;
+
+        if (nama && jumlah > 0) {
+            rincianSampah.push({ nama, jenis, jumlah });
+            document.getElementById('rincian_nama_barang').value = '';
+            document.getElementById('rincian_jumlah').value = '1';
+            renderRincianSampah();
+        } else {
+            Swal.fire('Peringatan', 'Nama barang dan jumlah harus diisi dengan benar.', 'warning');
         }
-    }
+    });
 
-    // fungsi untuk menampilkan dan menyembunyikan modal tambah reservasi
-    function showTambahModal() {
-        if (modalTambah) modalTambah.classList.add('show');
-    }
-    function hideTambahModal() {
-        if (modalTambah) modalTambah.classList.remove('show');
-        if(formTambahReservasi) formTambahReservasi.reset();
-    }
+    if (btnResetForm) btnResetForm.addEventListener('click', function() {
+        form.reset();
+        rincianSampah = [];
+        renderRincianSampah();
+        hitungTotalHarga();
+    });
 
-    function reloadModalValidasiContent() {
-        if (!currentReservasiId || !modalValidasiBody) return;
+    if (inputJumlahPendaki) inputJumlahPendaki.addEventListener('input', hitungTotalHarga);
+    if (inputJumlahParkir) inputJumlahParkir.addEventListener('input', hitungTotalHarga);
 
-        modalValidasiBody.innerHTML = '<p>Memuat ulang...</p>'; // Tanda loading
-        fetch(`reservasi/get_reservasi.php?id=${currentReservasiId}`)
+    // --- Form Submission (AJAX) ---
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(form);
+        formData.set('rincian_sampah_json', JSON.stringify(rincianSampah)); 
+        
+        if (!formData.get('id_pengguna')) {
+            Swal.fire('Peringatan', 'Mohon pilih Ketua Rombongan.', 'warning');
+            return;
+        }
+
+        Swal.fire({ title: 'Memproses Reservasi...', text: 'Mohon tunggu sebentar.', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
+
+        // Path fetch: relatif dari folder admin/
+        fetch('reservasi/' + submitEndpoint, { method: 'POST', body: formData })
+        .then(response => response.json().then(data => ({ status: response.status, body: data })))
+        .then(({ status, body }) => {
+            Swal.close();
+            if (status >= 200 && status < 300 && body.success) {
+                Swal.fire({ icon: 'success', title: 'Berhasil!', text: body.message + ' Anda akan diarahkan ke daftar reservasi.', }).then(() => {
+                    window.location.href = 'index.php?page=reservasi';
+                });
+            } else {
+                Swal.fire({ icon: 'error', title: 'Gagal!', text: body.error || 'Terjadi kesalahan saat membuat reservasi.', });
+            }
+        })
+        .catch(error => { Swal.close(); console.error('Error:', error); Swal.fire('Error', 'Terjadi kesalahan jaringan atau server.', 'error'); });
+    });
+    
+    hitungTotalHarga();
+};
+
+// =================================================================================
+// 2. LOGIKA NAVIGASI (Halaman Reservasi - Berjalan pada DOMContentLoaded)
+// =================================================================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    const mainContentArea = document.getElementById('main-content-area');
+    const navReservasi = document.getElementById('nav-reservasi');
+    const navTambahReservasi = document.getElementById('nav-tambah-reservasi');
+    
+    if (!mainContentArea) return; 
+
+    function loadTambahReservasiForm() {
+        fetch('reservasi/tambah_reservasi.php') 
             .then(response => {
-                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                if (!response.ok) {
+                    throw new Error(`Gagal memuat form. Status: ${response.status} ${response.statusText}`);
+                }
                 return response.text();
             })
             .then(html => {
-                modalValidasiBody.innerHTML = html;
-                // untuk sembunyikan form tambah barang setelah reload
-                const formAddItem = modalValidasiBody.querySelector('#form-tambah-item');
-                if (formAddItem) formAddItem.style.display = 'none';
-                 // untuk tambah barang kembali muncul
-                const showButton = modalValidasiBody.querySelector('#btn-show-add-item-form');
-                if(showButton) showButton.style.display = 'inline-flex';
+                // Ganti konten area utama
+                mainContentArea.innerHTML = html;
+                
+                // Update tampilan navigasi
+                if (navReservasi) navReservasi.classList.remove('active');
+                if (navTambahReservasi) navTambahReservasi.classList.add('active');
+                
+                // Panggil logika inisialisasi formulir
+                if (window.initializeTambahReservasiLogic) {
+                    window.initializeTambahReservasiLogic(); 
+                }
             })
             .catch(error => {
-                modalValidasiBody.innerHTML = `<p>Gagal memuat ulang data.</p><p class="error-message"><i>${error}</i></p>`;
-                console.error('Error reloading modal:', error);
+                console.error('AJAX Load Error:', error);
+                mainContentArea.innerHTML = `<div class="data-section" style="text-align:center; color:red; padding: 30px;">Error: ${error.message}. Cek konsol.</div>`;
             });
     }
-
-    document.querySelectorAll('.btn-validasi').forEach(button => {
-        button.addEventListener('click', function() {
-            currentReservasiId = this.dataset.id; 
-            reloadModalValidasiContent();
-            showValidasiModal(); 
-        });
-    });
-
-    document.querySelectorAll('.btn-hapus').forEach(button => {
-        button.addEventListener('click', function() {
-            const reservasiId = this.dataset.id;
-            Swal.fire({
-                title: 'Apakah Anda yakin?',
-                text: "Data reservasi ini akan dihapus permanen!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Ya, hapus!',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    fetch('reservasi/proses_reservasi.php', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ action: 'delete', id: reservasiId })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            Swal.fire('Terhapus!', data.message, 'success').then(() => location.reload());
-                        } else {
-                            Swal.fire('Gagal!', data.message, 'error');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        Swal.fire('Error!', 'Gagal menghapus data.', 'error');
-                    });
-                }
-            });
-        });
-    });
-
-    if (modalValidasiBody) {
-        modalValidasiBody.addEventListener('click', function(event) {
-            const target = event.target;
-            const button = target.closest('button');
-
-            if (!button) return;
-
-            const reservasiId = button.dataset.id;
-            const nextStatus = button.dataset.nextStatus;
-            let actionText = '';
-
-            // Aksi Setujui / Bayar / Selesai / Batal / Reopen
-            if (button.classList.contains('btn-setujui') || button.classList.contains('btn-selesai') || button.classList.contains('btn-batal') || button.classList.contains('btn-reopen')) {
-                 if (button.classList.contains('btn-setujui')) actionText = 'mengkonfirmasi pembayaran';
-                 else if (button.classList.contains('btn-selesai')) actionText = 'menandai reservasi selesai';
-                 else if (button.classList.contains('btn-batal')) actionText = 'membatalkan reservasi';
-                 else if (button.classList.contains('btn-reopen')) actionText = `membuka kembali reservasi (status menjadi ${nextStatus.replace('_',' ')})`;
-
-                 if (reservasiId && nextStatus && actionText) {
-                    Swal.fire({
-                        title: `Anda yakin ingin ${actionText}?`, icon: 'question',
-                        showCancelButton: true, confirmButtonText: 'Ya', cancelButtonText: 'Batal'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            fetch('reservasi/proses_reservasi.php', {
-                                method: 'POST', headers: {'Content-Type': 'application/json'},
-                                body: JSON.stringify({ action: 'update_status', id: reservasiId, status: nextStatus })
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    Swal.fire('Berhasil!', data.message, 'success').then(() => {
-                                        hideValidasiModal(); location.reload();
-                                    });
-                                } else { Swal.fire('Gagal!', data.message, 'error'); }
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                                Swal.fire('Error!', 'Gagal mengubah status.', 'error');
-                            });
-                        }
-                    });
-                 }
-                 return;
-            }
-
-            // Aksi Tampilkan Form Tambah Barang
-            else if (button.id === 'btn-show-add-item-form') {
-                const form = modalValidasiBody.querySelector('#form-tambah-item');
-                if (form) form.style.display = 'block';
-                button.style.display = 'none';
-            }
-            // Aksi Batal Tambah Barang
-            else if (button.id === 'btn-cancel-add-item') {
-                const form = modalValidasiBody.querySelector('#form-tambah-item');
-                const showButton = modalValidasiBody.querySelector('#btn-show-add-item-form');
-                if (form) { form.style.display = 'none'; form.reset(); } // Reset form juga
-                if (showButton) showButton.style.display = 'inline-flex';
-            }
-            // Aksi Hapus Barang Bawaan
-            else if (button.classList.contains('btn-delete-item')) {
-                const itemId = button.dataset.itemId;
-                 Swal.fire({ title: 'Hapus Barang Ini?', text: "Tindakan ini tidak bisa dibatalkan.", icon: 'warning',
-                    showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'Ya, hapus!', cancelButtonText: 'Batal'
-                 }).then((result) => {
-                    if (result.isConfirmed) {
-                         fetch('reservasi/proses_reservasi.php', {
-                            method: 'POST', headers: {'Content-Type': 'application/json'},
-                            body: JSON.stringify({ action: 'delete_barang', item_id: itemId })
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                reloadModalValidasiContent();
-                            } else { Swal.fire('Gagal!', data.message, 'error'); }
-                        })
-                         .catch(error => {
-                            console.error('Error:', error);
-                            Swal.fire('Error!', 'Gagal menghapus barang.', 'error');
-                        });
-                    }
-                 });
-            }
-
-        }); 
-
-        modalValidasiBody.addEventListener('submit', function(event){
-            if(event.target.id === 'form-tambah-item') {
-                event.preventDefault();
-
-                const namaBarang = modalValidasiBody.querySelector('#add-nama-barang').value.trim();
-                const jumlah = modalValidasiBody.querySelector('#add-jumlah-barang').value;
-                const jenisSampah = modalValidasiBody.querySelector('#add-jenis-sampah').value;
-
-                if (!namaBarang || !jumlah || !jenisSampah) {
-                     Swal.fire('Error', 'Semua field barang harus diisi.', 'error');
-                     return;
-                }
-
-                fetch('reservasi/proses_reservasi.php', {
-                    method: 'POST', headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        action: 'add_barang',
-                        id: currentReservasiId,
-                        nama_barang: namaBarang,
-                        jumlah: jumlah,
-                        jenis_sampah: jenisSampah
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        Swal.fire('Berhasil!', data.message, 'success'); 
-                        reloadModalValidasiContent(); 
-                    } else {
-                        Swal.fire('Gagal!', data.message, 'error');
-                    }
-                })
-                 .catch(error => {
-                    console.error('Error:', error);
-                    Swal.fire('Error!', 'Gagal menambah barang.', 'error');
-                });
-            }
-        });
-
-    } 
-
-    // untuk menutup modal validasi
-     if (modalValidasiCloseBtn) { modalValidasiCloseBtn.addEventListener('click', hideValidasiModal); }
-     if (modalValidasi) { modalValidasi.addEventListener('click', function(event) { if (event.target === modalValidasi) hideValidasiModal(); }); }
-
-    // untuk menampilkan modal tambah reservasi
-    if (btnTambahReservasi) { btnTambahReservasi.addEventListener('click', showTambahModal); }
-
-    // untuk submit form tambah reservasi
-    if (formTambahReservasi) {
-        formTambahReservasi.addEventListener('submit', function(event) {
-            event.preventDefault();
-            const formData = new FormData(formTambahReservasi);
-            const data = Object.fromEntries(formData.entries());
-            data.action = 'create';
-
-            fetch('reservasi/proses_reservasi.php', {
-                method: 'POST', headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(result => {
-                if (result.success) {
-                    Swal.fire('Berhasil!', result.message, 'success').then(() => {
-                        hideTambahModal(); location.reload();
-                    });
-                } else { Swal.fire('Gagal!', result.message, 'error'); }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                Swal.fire('Error!', 'Tidak dapat terhubung ke server.', 'error');
-            });
-        });
+    
+    function showReservasiContent() {
+         window.location.href = 'index.php?page=reservasi';
     }
 
-    // untuk menutup modal tambah reservasi
-    if (modalTambahCloseBtn) { modalTambahCloseBtn.addEventListener('click', hideTambahModal); }
-    if (modalTambah) { modalTambah.addEventListener('click', function(event) { if (event.target === modalTambah) hideTambahModal(); }); }
-
-}); 
+    // --- Event Listeners Navigasi ---
+    if (navTambahReservasi) navTambahReservasi.addEventListener('click', function(e) {
+        e.preventDefault();
+        loadTambahReservasiForm();
+    });
+    
+    if (navReservasi) navReservasi.addEventListener('click', function(e) {
+        e.preventDefault();
+        showReservasiContent();
+    });
+    
+    // --- Logika Global Lainnya ---
+    document.querySelectorAll('.btn-validasi').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.getElementById('modal-validasi').style.display = 'flex';
+        });
+    });
+    
+    document.querySelectorAll('.modal-close-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            this.closest('.modal-overlay').style.display = 'none';
+        });
+    });
+});
