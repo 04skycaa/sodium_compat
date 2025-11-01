@@ -1,11 +1,13 @@
 <?php
+// ... (Kode supabaseUrl, supabaseKey, dan fungsi supabase_request Anda yang sudah ada di sini) ...
+
 $supabaseUrl = "https://kitxtcpfnccblznbagzx.supabase.co";
 $supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtpdHh0Y3BmbmNjYmx6bmJhZ3p4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1ODIxMzEsImV4cCI6MjA3NTE1ODEzMX0.OySigpw4AWI3G7JW_8r8yXu7re0Mr9CYv8u3d9Fr548"; // Sebaiknya gunakan Service Key untuk operasi backend
 
-// Fungsi untuk melakukan request ke Supabase REST API
+// Fungsi utama request Anda (tidak diubah)
 function supabase_request($method, $endpoint, $data = null, $extra_headers = []) {
     global $supabaseUrl, $supabaseKey;
-
+    // ... (Implementasi cURL Anda) ...
     $url = "$supabaseUrl/rest/v1/$endpoint";
     $method = strtoupper($method);
 
@@ -19,11 +21,10 @@ function supabase_request($method, $endpoint, $data = null, $extra_headers = [])
 
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); // Mengembalikan hasil sebagai string
-    curl_setopt($ch, CURLOPT_TIMEOUT, 30); // Timeout 30 detik
-    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method); // Set metode HTTP (GET, POST, PATCH, DELETE)
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); 
+    curl_setopt($ch, CURLOPT_TIMEOUT, 30); 
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method); 
 
-    // Pengaturan spesifik untuk metode
     if (($method === 'POST' || $method === 'PATCH') && $data !== null) {
         $payload = json_encode($data);
         if (json_last_error() !== JSON_ERROR_NONE) {
@@ -50,7 +51,6 @@ function supabase_request($method, $endpoint, $data = null, $extra_headers = [])
         return ["error" => ["message" => "Kesalahan cURL: " . $curl_error]];
     }
 
-    // Decode respons JSON
     $decoded_response = json_decode($response_body, true);
     if (json_last_error() !== JSON_ERROR_NONE && !empty(trim($response_body))) {
         return ["error" => ["message" => "Gagal decode respons JSON", "raw_response" => $response_body, "http_code" => $http_code]];
@@ -66,5 +66,38 @@ function supabase_request($method, $endpoint, $data = null, $extra_headers = [])
         error_log("Supabase Request Error ({$http_code}) to {$endpoint}: " . print_r($decoded_response, true));
         return ["error" => ["message" => $errorMessage, "details" => $decoded_response, "http_code" => $http_code]];
     }
+}
+
+
+/**
+ * Fungsi Pembantu untuk mengambil daftar profiles (id, nama_lengkap)
+ * Digunakan di tambah_reservasi.php
+ */
+function fetchProfiles() {
+    // Endpoint: /profiles?select=id,nama_lengkap
+    $response = supabase_request('GET', 'profiles?select=id,nama_lengkap');
+    
+    if (isset($response['error'])) {
+        error_log("Gagal fetch profiles: " . $response['error']['message']);
+        return [];
+    }
+    return $response;
+}
+
+
+/**
+ * Fungsi Pembantu untuk mengambil kuota harian
+ * Digunakan di api_kuota.php
+ */
+function fetchKuota($tanggal) {
+    // Endpoint: /kuota_harian?tanggal_kuota=eq.[tanggal]&select=kuota_maksimal,kuota_terpesan
+    $filter = urlencode("tanggal_kuota=eq.{$tanggal}&select=kuota_maksimal,kuota_terpesan");
+    $response = supabase_request('GET', "kuota_harian?{$filter}");
+    
+    if (isset($response['error'])) {
+        error_log("Gagal fetch kuota untuk tanggal {$tanggal}: " . $response['error']['message']);
+        return ["error" => $response['error']['message']];
+    }
+    return $response;
 }
 ?>
