@@ -1,13 +1,9 @@
 <?php
-// ... (Kode supabaseUrl, supabaseKey, dan fungsi supabase_request Anda yang sudah ada di sini) ...
-
 $supabaseUrl = "https://kitxtcpfnccblznbagzx.supabase.co";
 $supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtpdHh0Y3BmbmNjYmx6bmJhZ3p4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1ODIxMzEsImV4cCI6MjA3NTE1ODEzMX0.OySigpw4AWI3G7JW_8r8yXu7re0Mr9CYv8u3d9Fr548"; // Sebaiknya gunakan Service Key untuk operasi backend
 
-// Fungsi utama request Anda (tidak diubah)
 function supabase_request($method, $endpoint, $data = null, $extra_headers = []) {
     global $supabaseUrl, $supabaseKey;
-    // ... (Implementasi cURL Anda) ...
     $url = "$supabaseUrl/rest/v1/$endpoint";
     $method = strtoupper($method);
 
@@ -69,12 +65,16 @@ function supabase_request($method, $endpoint, $data = null, $extra_headers = [])
 }
 
 
-/**
- * Fungsi Pembantu untuk mengambil daftar profiles (id, nama_lengkap)
- * Digunakan di tambah_reservasi.php
- */
+function supabase_request_patch($endpoint, $data) {
+    return supabase_request('PATCH', $endpoint, $data);
+}
+
+function supabase_request_delete($endpoint) {
+    return supabase_request('DELETE', $endpoint, null);
+}
+
+// Fungsi untuk mengambil data profiles
 function fetchProfiles() {
-    // Endpoint: /profiles?select=id,nama_lengkap
     $response = supabase_request('GET', 'profiles?select=id,nama_lengkap');
     
     if (isset($response['error'])) {
@@ -84,13 +84,9 @@ function fetchProfiles() {
     return $response;
 }
 
-
-/**
- * Fungsi Pembantu untuk mengambil kuota harian
- * Digunakan di api_kuota.php
- */
+// Fungsi untuk mengambil data kuota_harian berdasarkan tanggal
 function fetchKuota($tanggal) {
-    // Endpoint: /kuota_harian?tanggal_kuota=eq.[tanggal]&select=kuota_maksimal,kuota_terpesan
+    // untuk filter tanggal_kuota
     $filter = urlencode("tanggal_kuota=eq.{$tanggal}&select=kuota_maksimal,kuota_terpesan");
     $response = supabase_request('GET', "kuota_harian?{$filter}");
     

@@ -1,12 +1,6 @@
 <?php
-/**
- * Menggunakan file konfigurasi Supabase yang menyediakan fungsi supabase_request()
- * PATH: simaksi/convig/supabase.php (Asumsi file ini tersedia)
- */
-// Pastikan path include ini benar sesuai struktur proyek Anda
 include __DIR__ . '/../config/supabase.php';
 
-// WAJIB: Atur Zona Waktu Anda agar sesuai dengan data yang Anda input (Contoh: WIB)
 date_default_timezone_set('Asia/Jakarta'); 
 
 /**
@@ -16,40 +10,31 @@ date_default_timezone_set('Asia/Jakarta');
  * @param array $extraHeaders Header tambahan jika diperlukan (misalnya untuk count)
  * @return array Hasil data yang diambil.
  */
+
 function fetchData($tableName, $filters = '', $extraHeaders = []) {
-    // Menggunakan fungsi supabase_request yang sudah ada di file yang di-include
     $response = supabase_request('GET', $tableName . '?' . $filters, null, $extraHeaders);
     
-    // Cek jika ada error dari API
     if (isset($response['error'])) {
         error_log("Gagal fetch data dari tabel {$tableName}: " . ($response['error']['message'] ?? 'Kesalahan tidak diketahui.'));
-        // Mengembalikan array kosong jika terjadi kesalahan
         return [];
     }
     return $response;
 }
 
-// Mendapatkan tanggal hari ini dalam format Supabase (YYYY-MM-DD)
+//untuk tanggal hari ini, awal bulan ini, dan 7 hari terakhir
 $today_date = date('Y-m-d'); 
-$first_day_of_month = date('Y-m-01'); // Contoh: '2025-11-01'
-$last_7_days = date('Y-m-d', strtotime('-7 days')); // Mulai dari 7 hari yang lalu
+$first_day_of_month = date('Y-m-01'); 
+$last_7_days = date('Y-m-d', strtotime('-7 days'));
 
-// =========================================================
-// 1. PENGAMBILAN DATA UNTUK METRIK (FOKUS HARIAN)
-// =========================================================
-
-// A. Total Reservasi Hari Ini (HARIAN)
-// Gambar 2 (reservasi) menunjukkan kolom id_reservasi yang digunakan.
+// untuk menyimpan data metrik
 $reservasi_hari_ini_raw = fetchData('reservasi', 'tanggal_pendakian=eq.' . $today_date . '&select=id_reservasi');
 $total_reservasi_hari_ini = count($reservasi_hari_ini_raw);
 
-// B. Total Pendaki Hari Ini (HARIAN)
-// Gambar 3 (pendaki_rombongan) menunjukkan kolom id_pendaki yang digunakan.
+// untuk menghitung total pendaki hari ini
 $pendaki_hari_ini_raw = fetchData('pendaki_rombongan', 'tanggal_registrasi=eq.' . $today_date . '&select=id_pendaki');
 $total_pendaki_hari_ini = count($pendaki_hari_ini_raw);
 
-// C. Kuota Hari Ini (Sisa Kuota) (HARIAN)
-// Gambar 4 (kuota_harian) menunjukkan kolom kuota_maksimal dan kuota_terpakai.
+// untuk menghitung sisa kuota hari ini
 $kuota_harian_data = fetchData('kuota_harian', 'tanggal_kuota=eq.' . $today_date . '&select=kuota_maksimal,kuota_terpakai');
 $sisa_kuota = 0;
 if (!empty($kuota_harian_data)) {
@@ -58,13 +43,12 @@ if (!empty($kuota_harian_data)) {
     $sisa_kuota = $max - $terpakai;
 }
 
-// D. Total Pemasukan Hari Ini (HARIAN)
-// Gambar 6 (pemasukan) menunjukkan kolom tanggal_pemasukan dan jumlah.
+// untuk menghitung total pemasukan hari ini
 $pemasukan_hari_ini_raw = fetchData('pemasukan', "tanggal_pemasukan=eq." . $today_date . '&select=jumlah');
 $total_pemasukan_hari_ini = array_sum(array_column($pemasukan_hari_ini_raw, 'jumlah'));
 
 
-// E. Aktivitas Terbaru (Reservasi Terbaru) (HARIAN/TERBARU)
+// untuk mengambil 5 aktivitas reservasi terbaru  
 $aktivitas_terbaru_raw = fetchData('reservasi', 'order=created_at.desc&limit=5&select=created_at,id_reservasi,status_reservasi');
 $aktivitas_terbaru = [];
 
@@ -100,7 +84,7 @@ foreach ($aktivitas_terbaru_raw as $res) {
 }
 
 
-// F. Data Diagram Status Reservasi (BULANAN) 
+// untuk menghitung status reservasi bulan ini
 $reservations_this_month = fetchData('reservasi', "tanggal_pendakian=gte." . $first_day_of_month . '&select=status_reservasi');
 
 $status_counts = [
@@ -118,8 +102,7 @@ foreach ($reservations_this_month as $res) {
 }
 
 
-// G. Grafik Pemasukan & Pengeluaran (7 HARI TERAKHIR)
-// Menyiapkan array kosong untuk 7 hari terakhir
+// untuk data pendapatan dan pengeluaran bulanan serta 7 hari terakhir
 $date_range = [];
 for ($i = 0; $i < 8; $i++) {
     $date_range[] = date('Y-m-d', strtotime("-$i days"));
@@ -131,46 +114,39 @@ $pemasukan_harian_data = array_fill_keys($date_range, 0);
 $pengeluaran_harian_data = array_fill_keys($date_range, 0);
 
 foreach ($date_range as $date) {
-    // Ambil tanggal dan bulan (e.g., '1 Nov') untuk label chart
     $pendapatan_harian_labels[] = date('j M', strtotime($date)); 
 }
 
-// 1. Proses Pemasukan (Bulanan dan 7 hari)
+// untuk proses pemasukan (bulanan dan 7 hari)
 $pemasukan_bulanan_raw = fetchData('pemasukan', "tanggal_pemasukan=gte." . $first_day_of_month . '&select=tanggal_pemasukan,jumlah');
 $total_pemasukan_bulanan = array_sum(array_column($pemasukan_bulanan_raw, 'jumlah'));
 
 foreach ($pemasukan_bulanan_raw as $data) {
     $date_only = substr($data['tanggal_pemasukan'], 0, 10); 
-    // Hanya tambahkan ke data harian jika tanggalnya ada dalam 7 hari terakhir
     if (isset($pemasukan_harian_data[$date_only])) {
         $pemasukan_harian_data[$date_only] += $data['jumlah'];
     }
 }
 
-// 2. Proses Pengeluaran (Bulanan dan 7 hari)
-// Gambar 1 (pengeluaran) menunjukkan kolom tanggal_pengeluaran dan jumlah.
+// untuk proses pengeluaran (bulanan dan 7 hari)
 $pengeluaran_bulanan_raw = fetchData('pengeluaran', "tanggal_pengeluaran=gte." . $first_day_of_month . '&select=tanggal_pengeluaran,jumlah');
 $total_pengeluaran_bulanan = array_sum(array_column($pengeluaran_bulanan_raw, 'jumlah'));
 
 foreach ($pengeluaran_bulanan_raw as $data) {
     $date_only = substr($data['tanggal_pengeluaran'], 0, 10); 
-    // Hanya tambahkan ke data harian jika tanggalnya ada dalam 7 hari terakhir
     if (isset($pengeluaran_harian_data[$date_only])) {
         $pengeluaran_harian_data[$date_only] += $data['jumlah'];
     }
 }
 
-
-// =========================================================
-// 2. SUNATIKAN DATA KE JAVASCRIPT
-// =========================================================
+// untuk menyiapkan data JSON untuk JavaScript
 
 $js_data = [
     'pemasukan' => $total_pemasukan_bulanan,
     'pengeluaran' => $total_pengeluaran_bulanan, 
     'aktivitas' => $aktivitas_terbaru,
     'reservasiStatus' => $status_counts,
-    'pendapatanHarian' => [ // Diubah namanya menjadi Harian (7 Hari Terakhir)
+    'pendapatanHarian' => [ 
         'labels' => $pendapatan_harian_labels,
         'pemasukan' => array_values($pemasukan_harian_data), 
         'pengeluaran' => array_values($pengeluaran_harian_data)
@@ -189,25 +165,20 @@ $json_data = json_encode($js_data);
     <script src="https://code.iconify.design/1/1.0.7/iconify.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* ------------------------------------- */
-        /* 1. Variabel CSS Global */
-        /* ------------------------------------- */
         :root {
-            --color-primary: #10b981; /* Hijau Emerald */
-            --color-secondary: #059669; /* Hijau Gelap */
-            --color-background: #f3f4f6; /* Abu-abu Sangat Terang */
-            --color-card-bg: #ffffff; /* Putih */
-            --color-text-dark: #1f2937; /* Teks Gelap */
-            --color-text-light: #6b7280; /* Teks Abu-abu */
-            --color-blue: #3b82f6; /* Biru (untuk Pemasukan) */
-            --color-red: #ef4444; /* Merah (untuk Pengeluaran) */
+            --color-primary: #75B368; 
+            --color-secondary: #35542E; 
+            --color-background: #f3f4f6;
+            --color-card-bg: #ffffff; 
+            --color-text-dark: #1f2937; 
+            --color-text-light: #6b7280; 
+            --color-blue: #3b82f6; 
+            --color-red: #ef4444; 
             --shadow-light: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
             --transition-duration: 0.3s;
         }
 
-        /* ------------------------------------- */
-        /* 2. Keyframes Animasi */
-        /* ------------------------------------- */
+        /* untuk animasi masuk */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -219,9 +190,7 @@ $json_data = json_encode($js_data);
             100% { box-shadow: var(--shadow-light); }
         }
 
-        /* ------------------------------------- */
-        /* 3. Gaya Dasar dan Global */
-        /* ------------------------------------- */
+        /* untuk reset dasar */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -265,9 +234,7 @@ $json_data = json_encode($js_data);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
         }
 
-        /* ------------------------------------- */
-        /* 4. Layout Grid Utama */
-        /* ------------------------------------- */
+        /* untuk tampilan grid */
         .grid-top {
             display: grid;
             gap: 20px;
@@ -305,9 +272,7 @@ $json_data = json_encode($js_data);
             }
         }
 
-        /* ------------------------------------- */
-        /* 5. Gaya Kartu Metrik */
-        /* ------------------------------------- */
+        /* untuk tampilan kartu metrik */
         .metric-card {
             display: flex;
             flex-direction: column;
@@ -345,9 +310,7 @@ $json_data = json_encode($js_data);
             animation: fadeIn 0.5s ease-out both; 
         }
 
-        /* ------------------------------------- */
-        /* 6. Diagram Status Reservasi */
-        /* ------------------------------------- */
+        /* untuk diagram keuangan */
         .diagram-keuangan { 
             text-align: center;
             align-items: center;
@@ -362,18 +325,15 @@ $json_data = json_encode($js_data);
             width: 100%;
             border-bottom: 1px solid #e5e7eb;
             padding-bottom: 10px;
-            
-            /* --- PERBAIKAN TAMPILAN & WARNA --- */
-            color: var(--color-secondary); /* WARNA HIJAU GELAP */
+            color: var(--color-secondary); 
             padding-top: 0; 
             margin-top: 0;
             padding-left: 0; 
             margin-right: 0;
             box-sizing: border-box; 
-            /* ---------------------------------- */
         }
 
-        /* Class untuk Dot Warna */
+        /* untuk detail status reservasi */
         .color-dot { 
             display: inline-block;
             width: 10px;
@@ -402,9 +362,7 @@ $json_data = json_encode($js_data);
             max-height: 150px;
         }
 
-        /* ------------------------------------- */
-        /* 7. Kartu Bawah (Aktivitas & Grafik) */
-        /* ------------------------------------- */
+        /* untuk aktivitas terbaru dan grafik pendapatan mingguan */
         .aktivitas-terakhir h3, .grafik-pendapatan-mingguan h3 {
             font-size: 1.125rem;
             font-weight: 600;
@@ -481,9 +439,6 @@ $json_data = json_encode($js_data);
 <body>
     
     <div id="dashboard-container" class="dashboard-container">
-        
-        <h1>Dashboard Administrasi Pendakian 🏕️</h1>
-        
         <div class="grid-top">
 
             <div class="grid-metrik-2x2">
@@ -601,8 +556,6 @@ $json_data = json_encode($js_data);
         function renderAktivitas() {
             const ul = document.getElementById('daftar-aktivitas');
             
-            // Logika ini hanya untuk memastikan warna ikon/status di JS konsisten 
-            // jika ada perubahan pada data dashboard yang sudah dirender oleh PHP
             if (ul.children.length > 0) {
                 const items = ul.getElementsByClassName('activity-item');
                 dataDashboard.aktivitas.forEach((item, index) => {
@@ -611,25 +564,21 @@ $json_data = json_encode($js_data);
                         const iconSpan = li.querySelector('.iconify');
                         const status = item.status;
                         
-                        let statusColor = '#6b7280'; // Default abu-abu
+                        let statusColor = '#6b7280'; 
                         if (status && status.toLowerCase().includes('terkonfirmasi')) {
                             statusColor = 'var(--color-primary)'; 
                         } else if (status && status.toLowerCase().includes('menunggu')) {
-                            statusColor = '#f59e0b'; // Kuning
+                            statusColor = '#f59e0b'; 
                         } else if (status && status.toLowerCase().includes('dibatalkan')) {
-                            statusColor = 'var(--color-red)'; // Merah
+                            statusColor = 'var(--color-red)'; 
                         } else if (status && status.toLowerCase().includes('selesai')) {
-                            statusColor = '#3b82f6'; // Biru 
+                            statusColor = '#3b82f6';  
                         }
 
-                        // Update warna ikon
                         if (iconSpan) iconSpan.style.color = statusColor;
-                        
-                        // Memperbarui konten teks
                         const pElement = li.querySelector('p');
                         const timeSpan = li.querySelector('span:last-child');
                         if (pElement) {
-                            // Mengganti marker markdown ** dengan tag <strong> untuk HTML yang valid
                             const actionTextHtml = item.aksi.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                             pElement.innerHTML = actionTextHtml + ` (Kode Booking: ${item.kode_booking})`;
                         }
@@ -699,7 +648,6 @@ $json_data = json_encode($js_data);
         // Fungsi untuk me-render grafik pendapatan harian (Line Chart)
         function renderPendapatanChart() {
             const ctx = document.getElementById('pendapatanMingguanChart').getContext('2d');
-            // MENGAMBIL DATA DARI KEY BARU: pendapatanHarian
             const data = dataDashboard.pendapatanHarian; 
 
             const formatRupiah = (value) => `Rp ${value.toLocaleString('id-ID', { maximumFractionDigits: 0 })}`;
@@ -727,7 +675,7 @@ $json_data = json_encode($js_data);
                         data: data.pengeluaran,
                         borderColor: getComputedStyle(document.documentElement).getPropertyValue('--color-red'), // Merah untuk Pengeluaran
                         backgroundColor: 'rgba(239, 68, 68, 0.2)', 
-                        fill: false, // Tidak perlu diisi
+                        fill: false, 
                         tension: 0.4, 
                         pointBackgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--color-red'),
                         pointBorderColor: '#fff',
@@ -741,7 +689,7 @@ $json_data = json_encode($js_data);
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { display: true }, // Tampilkan legend karena ada 2 dataset
+                        legend: { display: true },
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
@@ -756,7 +704,6 @@ $json_data = json_encode($js_data);
                             beginAtZero: true,
                             ticks: {
                                 callback: function(value, index, values) {
-                                    // Format sumbu Y menjadi jutaan
                                     if (value >= 1000000) return `Rp ${value/1000000} Juta`;
                                     return formatRupiah(value);
                                 }
@@ -767,13 +714,10 @@ $json_data = json_encode($js_data);
             });
         }
 
-        // Fungsi utama yang dipanggil saat halaman dimuat
         window.onload = function() {
             renderAktivitas();
             renderReservasiStatusDonutChart(); 
             renderPendapatanChart();
-            
-            // Anda dapat menambahkan lebih banyak event listener di sini jika diperlukan
         };
     </script>
 </body>

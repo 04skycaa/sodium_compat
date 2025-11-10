@@ -1,11 +1,6 @@
 <?php
-// ==========================================================
-// FILE: api/bikin_reservasi.php
-// Endpoint API untuk CREATE Reservasi dan ambil data harga.
-// ==========================================================
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-// Perbaikan: Asumsi file config.php berada di direktori yang sama
 require_once 'config.php';
 
 header('Content-Type: application/json');
@@ -18,9 +13,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
+/**
+ * Fungsi untuk mengupload file Base64 ke Supabase Storage.
+ * Anda HARUS mengimplementasikan fungsi ini menggunakan Service Key Supabase Anda
+ * dan library HTTP (seperti cURL) untuk berkomunikasi dengan Supabase Storage API.
+ * * @param string $base64_string Data file dalam format Base64 mentah.
+ * @param string $mime_type MIME type dari file (misalnya image/jpeg, application/pdf).
+ * @param string $file_name Nama file yang diusulkan.
+ * @param string $bucket_name Nama bucket target (default: surat-sehat).
+ * @return array ['url' => public_url] jika sukses, atau ['error' => message] jika gagal.
+ */
+if (!function_exists('upload_base64_to_supabase_storage')) {
+    function upload_base64_to_supabase_storage($base64_string, $mime_type, $file_name, $bucket_name = 'surat-sehat') {
+        $timestamp = time();
+        $unique_name = $bucket_name . '_' . $timestamp . '_' . uniqid() . '.' . explode('/', $mime_type)[1];
+        
+        $public_url = "https://your-supabase-storage-url.supabase.co/storage/v1/object/public/{$bucket_name}/{$unique_name}";
+        return ['error' => 'Fungsi upload Base64 ke Supabase Storage belum diimplementasikan di backend. Mohon hubungi developer.']; 
+    }
+}
+
+
 try {
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        // --- Perbaikan di sini: Ambil kolom nama_item dan harga dari pengaturan_biaya ---
         $response = makeSupabaseRequest('pengaturan_biaya?select=nama_item,harga', 'GET');
         
         if (isset($response['error'])) {
@@ -29,30 +44,26 @@ try {
             exit;
         }
         
-        // Mengubah array hasil menjadi map agar mudah diakses di Frontend
         $pricing_map = [];
         foreach ($response['data'] as $item) {
             $pricing_map[$item['nama_item']] = (int)$item['harga'];
         }
         
-        // Mengirim data harga dalam format map
         echo json_encode([
             'status' => 'success', 
-            'data' => $pricing_map
+            'data' => $pricing_map 
         ]);
 
     } 
     elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $data = json_decode(file_get_contents('php://input'), true);
 
-        // ... [Logika POST tetap sama] ...
-        
-        // Validate required fields
+        // untuk validasi data masuk
         if (!isset($data['tanggal_pendakian']) || !isset($data['jumlah_pendaki']) || 
             !isset($data['jumlah_tiket_parkir']) || !isset($data['total_harga']) || 
             !isset($data['id_pengguna']) || !isset($data['anggota_rombongan'])) {
             http_response_code(400);
-            echo json_encode(['error' => 'Data tidak lengkap']);
+            echo json_encode(['error' => 'Data tidak lengkap.']);
             exit;
         }
 
@@ -65,24 +76,16 @@ try {
         $anggota_rombongan = $data['anggota_rombongan'];
         $barang_bawaan = $data['barang_bawaan'] ?? [];
 
-        // Check quota availability manually by fetching from kuota_harian table
+        // untuk pengecekan kuota
         $kuota_response = makeSupabaseRequest(
             'kuota_harian?select=kuota_maksimal,kuota_terpesan&tanggal_kuota=eq.' . urlencode($tanggal_pendakian), 
             'GET'
         );
-
-        if (isset($kuota_response['error'])) {
-            http_response_code(500);
-            echo json_encode(['error' => 'Gagal memeriksa kuota: ' . $kuota_response['error']]);
-            exit;
-        }
-
-        $kuota_data = $kuota_response['data'];
-        $available_quota = 50; 
         
-        if (!empty($kuota_data)) {
-            $available_quota = $kuota_data[0]['kuota_maksimal'] - $kuota_data[0]['kuota_terpesan'];
-        }
+        $kuota_data = $kuota_response['data'] ?? [];
+        $kuotaTerpesan = $kuota_data[0]['kuota_terpesan'] ?? 0;
+        $kuotaMaksimal = $kuota_data[0]['kuota_maksimal'] ?? 50; 
+        $available_quota = $kuotaMaksimal - $kuotaTerpesan;
         
         if ($available_quota < $jumlah_pendaki) {
             http_response_code(400);
@@ -90,28 +93,17 @@ try {
             exit;
         }
 
-        // Check if user exists in profiles
+        // --- Pengecekan User ---
         $user_response = makeSupabaseRequest('profiles?select=id,nama_lengkap&' . 'id=eq.' . urlencode($id_pengguna), 'GET');
-        
-        if (isset($user_response['error'])) {
-            http_response_code(500);
-            echo json_encode(['error' => $user_response['error']]);
-            exit;
+        if (empty($user_response['data'])) {
+             http_response_code(400);
+             echo json_encode(['error' => 'User (Ketua Rombongan) tidak ditemukan.']);
+             exit;
         }
-
-        $user_id = null;
-        if (isset($user_response['data']) && count($user_response['data']) > 0) {
-            $user_id = $user_response['data'][0]['id'];
-        } else {
-            http_response_code(400);
-            echo json_encode(['error' => 'User tidak ditemukan di database. Harap daftarkan user terlebih dahulu sebelum membuat reservasi.']);
-            exit;
-        }
-
-        // Generate reservation code
+        $user_id = $user_response['data'][0]['id'];
         $kode_reservasi = 'R' . date('Ymd') . strtoupper(substr(md5(uniqid(mt_rand(), true)), 0, 6));
 
-        // Insert reservation
+        // untuk insert data reservasi utama
         $reservation_data = [
             'id_pengguna' => $user_id,
             'kode_reservasi' => $kode_reservasi,
@@ -120,7 +112,7 @@ try {
             'jumlah_tiket_parkir' => $jumlah_tiket_parkir,
             'total_harga' => $total_harga,
             'jumlah_potensi_sampah' => $jumlah_potensi_sampah,
-            'status' => 'pending', // Set status awal
+            'status' => 'pending', 
         ];
         
         $reservation_response = makeSupabaseRequest('reservasi', 'POST', $reservation_data);
@@ -130,11 +122,34 @@ try {
             echo json_encode(['error' => 'Gagal membuat reservasi: ' . $reservation_response['error']]);
             exit;
         }
-
         $id_reservasi = $reservation_response['data'][0]['id_reservasi'];
 
-        // Insert group members (pendaki_rombongan)
+        // untuk insert anggota rombongan
         foreach ($anggota_rombongan as $pendaki) {
+            $url_surat_sehat = $pendaki['url_surat_sehat'] ?? null;
+            
+            if (strpos($url_surat_sehat, 'data:') === 0) {
+                list($meta, $base64_string) = explode(';', $url_surat_sehat);
+                list($base64_indicator, $base64_data) = explode(',', $base64_string);
+                $mime_type = str_replace('data:', '', $meta);
+                $file_name_for_storage = $pendaki['nama_lengkap'] . '_' . $id_reservasi . '_' . time();
+                $upload_result = upload_base64_to_supabase_storage($base64_data, $mime_type, $file_name_for_storage);
+                
+                if (isset($upload_result['error'])) {
+                     http_response_code(500);
+                     echo json_encode(['error' => 'Gagal upload surat sehat untuk ' . $pendaki['nama_lengkap'] . ': ' . $upload_result['error']]);
+                     exit;
+                }
+                
+                $pendaki['url_surat_sehat'] = $upload_result['url']; 
+
+            } elseif ($url_surat_sehat !== null && $url_surat_sehat !== "") {
+                $pendaki['url_surat_sehat'] = $url_surat_sehat;
+            } else {
+                $pendaki['url_surat_sehat'] = null;
+            }
+
+            // Insert pendaki rombongan
             $pendaki_data = [
                 'id_reservasi' => $id_reservasi,
                 'nama_lengkap' => $pendaki['nama_lengkap'],
@@ -142,7 +157,7 @@ try {
                 'alamat' => $pendaki['alamat'],
                 'nomor_telepon' => $pendaki['nomor_telepon'],
                 'kontak_darurat' => $pendaki['kontak_darurat'],
-                'url_surat_sehat' => $pendaki['url_surat_sehat'] ?? null
+                'url_surat_sehat' => $pendaki['url_surat_sehat']
             ];
             
             $pendaki_response = makeSupabaseRequest('pendaki_rombongan', 'POST', $pendaki_data);
@@ -154,7 +169,7 @@ try {
             }
         }
 
-        // Insert waste items (barang_bawaan_sampah)
+        // untuk insert barang bawaan sampah
         foreach ($barang_bawaan as $barang) {
             $barang_data = [
                 'id_reservasi' => $id_reservasi,
@@ -172,12 +187,11 @@ try {
             }
         }
 
-        // Update kuota_terpesan (Hanya jika reservasi berhasil)
+        // untuk update kuota terpesan
         $update_kuota_endpoint = 'kuota_harian?tanggal_kuota=eq.' . urlencode($tanggal_pendakian);
         $kuota_update_data = ['kuota_terpesan' => (int)$kuotaTerpesan + (int)$jumlah_pendaki];
         makeSupabaseRequest($update_kuota_endpoint, 'PATCH', $kuota_update_data);
         
-        // Return success response
         echo json_encode([
             'success' => true,
             'message' => 'Reservasi berhasil dibuat',

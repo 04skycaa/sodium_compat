@@ -3,6 +3,29 @@ session_start();
 
 $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
 
+if ($page === 'reservasi' && isset($_GET['action'])) {
+    
+    $content_path = '../admin/reservasi/reservasi.php';
+
+    if (file_exists($content_path)) {
+        if (ob_get_level() === 0) {
+            ob_start();
+        }
+        
+        include $content_path;
+        
+        ob_end_clean();
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'Internal server error: AJAX logic did not exit properly.']);
+        die(); 
+    } else {
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'Endpoint file tidak ditemukan.']);
+        die();
+    }
+}
+// =========================================================================
+
 switch ($page) {
     case 'kuota_pendakian':
         $content = '../admin/kuota_pendakian/kuota_pendakian.php';
@@ -116,51 +139,51 @@ switch ($page) {
                     </a>
                 </li>
                 
-         </ul>
+           </ul>
         </div>
         
                 <div class="main active">
              <div class="topbar">
                  <div class="topbar-left">
-                 <span id="active-menu-title" class="topbar-menu-name">
-                        <?php 
-                            $menu_titles = [
-                                'dashboard' => 'Dashboard',
-                                'reservasi' => 'Reservasi & Validasi',
-                                'kuota_pendakian' => 'Kuota Pendakian',
-                                'pengumuman' => 'Pengumuman',
-                                'pembukuan' => 'Keuangan',
-                                'manage_pendakian' => 'Manage Pendakian',
-                                'user' => 'Management User'
-                            ];
-                            $current_title = isset($menu_titles[$page]) ? $menu_titles[$page] : 'Dashboard';
-                            echo $current_title;
-                        ?>
-                    </span>
-            </div>
-        <div class="topbar-right">
-     <div class="topbar-info">
-    <span id="topbar-greeting" style="font-size: 0.95em; font-weight: 600; color: #35542E;">Selamat Pagi</span>
-    <span id="current-date" style="margin-top: 5px;">Jumat, 24 Oktober 2025</span>
-    <span id="current-time">14:13:10</span>
-    </div>
-         <a href="index.php?page=user_profile" class="topbar-user">
-         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12 4a4 4 0 0 1 4 4a4 4 0 0 1-4 4a4 4 0 0 1-4-4a4 4 0 0 1 4-4m0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4"/></svg>
-         <span>zawawi</span>
-         </a> 
+                     <span id="active-menu-title" class="topbar-menu-name">
+                         <?php 
+                             $menu_titles = [
+                                 'dashboard' => 'Dashboard',
+                                 'reservasi' => 'Reservasi & Validasi',
+                                 'kuota_pendakian' => 'Kuota Pendakian',
+                                 'pengumuman' => 'Pengumuman',
+                                 'pembukuan' => 'Keuangan',
+                                 'manage_pendakian' => 'Manage Pendakian',
+                                 'user' => 'Management User'
+                             ];
+                             $current_title = isset($menu_titles[$page]) ? $menu_titles[$page] : 'Dashboard';
+                             echo $current_title;
+                         ?>
+                     </span>
+             </div>
+             <div class="topbar-right">
+            <div class="topbar-info">
+             <span id="topbar-greeting" style="font-size: 0.95em; font-weight: 600; color: #35542E;">Selamat Pagi</span>
+             <span id="current-date" style="margin-top: 5px;">Jumat, 24 Oktober 2025</span>
+             <span id="current-time">14:13:10</span>
+             </div>
+              <a href="index.php?page=user_profile" class="topbar-user">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12 4a4 4 0 0 1 4 4a4 4 0 0 1-4 4a4 4 0 0 1-4-4a4 4 0 0 1 4-4m0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4"/></svg>
+              <span>zawawi</span>
+              </a> 
 
-    <a href="../auth/login.php" class="btn-logout">
-     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 14 14"><path fill="currentColor" fill-rule="evenodd" d="M2.5.351a40.5 40.5 0 0 1 5.74 0c1.136.081 2.072.874 2.264 1.932a2.25 2.25 0 0 0-2.108 2.28H4.754a2.25 2.25 0 0 0 0 4.5h3.642a2.25 2.25 0 0 0 2.145 2.281l-.004.085c-.06 1.2-1.06 2.132-2.296 2.22a40.5 40.5 0 0 1-5.742 0C1.263 13.561.263 12.63.203 11.43a91 91 0 0 1 0-8.859C.263 1.372 1.263.439 2.5.351m7.356 5.462L9.661 4.7a1 1 0 0 1 1.432-1.067c1.107.553 2.178 1.624 2.731 2.731a1 1 0 0 1 0 .895c-.553 1.107-1.624 2.178-2.731 2.731A1 1 0 0 1 9.66 8.924l.195-1.111H4.754a1 1 0 1 1 0-2z" clip-rule="evenodd"/></svg>
-     <span>Logout</span>
-     </a>
-                </div>
+             <a href="../auth/login.php" class="btn-logout">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 14 14"><path fill="currentColor" fill-rule="evenodd" d="M2.5.351a40.5 40.5 0 0 1 5.74 0c1.136.081 2.072.874 2.264 1.932a2.25 2.25 0 0 0-2.108 2.28H4.754a2.25 2.25 0 0 0 0 4.5h3.642a2.25 2.25 0 0 0 2.145 2.281l-.004.085c-.06 1.2-1.06 2.132-2.296 2.22a40.5 40.5 0 0 1-5.742 0C1.263 13.561.263 12.63.203 11.43a91 91 0 0 1 0-8.859C.263 1.372 1.263.439 2.5.351m7.356 5.462L9.661 4.7a1 1 0 0 1 1.432-1.067c1.107.553 2.178 1.624 2.731 2.731a1 1 0 0 1 0 .895c-.553 1.107-1.624 2.178-2.731 2.731A1 1 0 0 1 9.66 8.924l.195-1.111H4.754a1 1 0 1 1 0-2z" clip-rule="evenodd"/></svg>
+              <span>Logout</span>
+             </a>
+             </div>
              </div>
             <div class="content-area"> 
-    <?php include $content; ?>
+             <?php include $content; ?>
+            </div>
     </div>
-     </div>
 
-  <script src="../assets/js/script.js"></script>
+    <script src="../assets/js/script.js"></script>
 </body>
 
 </html>
