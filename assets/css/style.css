@@ -30,11 +30,16 @@ body {
   min-height: 100vh;
   height: 100%;
   overflow-x: hidden;
+  display: flex;
+  background-color: var(--main-bg);
 }
 
 .container {
   position: relative;
   width: 100%;
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--main-bg);
 }
 
 .navigation {
@@ -178,9 +183,9 @@ body {
   left: 260px;
   min-height: 100vh;
   height: 100vh;
-  background: var(--main-bg); /* Menggunakan --main-bg: #ffffff */
+  background: var(--main-bg);
   transition: 0.5s;
-  padding: 0; /* Hapus padding agar topbar bisa full width/height */
+  padding: 0;
   overflow-y: auto;
 }
 
@@ -189,9 +194,8 @@ body {
   left: 80px;
 }
 
-/* Adjust padding-top on main so content doesn't get hidden under fixed topbar */
 .main .content-area {
-    padding: 15px; /* Pindahkan padding ke area konten utama di bawah topbar */
+    padding: 15px; 
 }
 
 .toggle {
@@ -249,7 +253,7 @@ body {
   box-shadow: 0 0 5px rgba(53,84,46,0.3);
 }
 
-/* ====== TOPBAR KEREN BARU DENGAN ANIMASI ====== */
+/* gaya tampilan untuk topbar */
 .topbar {
     position: sticky; 
     top: 0;
@@ -257,20 +261,39 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin: var(--topbar-float-margin);
-    margin-bottom: 5px;
+    margin: var(--topbar-float-margin); 
+    margin-bottom: 5px; 
     background: var(--topbar-bg-light); 
-    border-radius: 15px; 
-    box-shadow: var(--topbar-shadow); 
-    padding: 0; 
+    border-radius: 35px;
+    border: 1px solid rgba(53, 84, 46, 0.2); 
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); 
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+    padding: 10px 25px;
 }
 
-/* Nama Menu Aktif (Sisi Kiri) */
 .topbar-left {
     display: flex;
     align-items: center;
-    padding: 15px 25px; 
+    padding: 25; 
+}
+
+.topbar-right {
+    display: flex;
+    align-items: center; 
+    height: auto; 
+    background: transparent; 
+    padding: 25; 
+    border-radius: 0; 
+    gap: 15px; 
+}
+
+.topbar-menu-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+    color: var(--hover-text); 
+    transform: scale(1.2); 
 }
 
 .topbar-menu-name {
@@ -279,24 +302,13 @@ body {
     color: var(--hover-text); 
 }
 
-/* informasi sebelah kanan) */
-.topbar-right {
-    display: flex;
-    align-items: center; 
-    height: auto; 
-    background: transparent; 
-    padding: 0 15px 0 0; 
-    border-radius: 0 15px 15px 0; 
-    gap: 15px; 
-}
-
 /* untuk informasi dari topbar */
 .topbar-info {
     display: flex;
     flex-direction: column; 
     justify-content: center; 
     align-items: flex-end;
-    padding: 10px 15px; 
+    padding: 5px 15px; 
     margin: 0;
     background: transparent; 
     font-size: 0.8em; 
@@ -305,34 +317,35 @@ body {
 
 /* jam dan tanggal*/
 #current-time {
-    font-size: 1.1em;
+    font-size: 1.2em;
     font-weight: 700;
     color: var(--time-color); 
     animation: pulseTime 3s infinite ease-in-out;
 }
 
-/* User BLOCK: Memanjang, Bulat, dan Animasi */
 .topbar-user {
     display: flex;
     flex-direction: row; 
     align-items: center;
     justify-content: center;
+    text-decoration: none;
     padding: 8px 18px; 
     height: 40px; 
-    background-color: transparent; 
-    color: var(--user-text-color);
+    background: linear-gradient(145deg, var(--hover-bg), #f0f0f0); 
+    color: var(--hover-text); 
     font-weight: 600;
-    border-radius: 20px; 
-    border: 2px solid var(--green-pastel); 
+    border-radius: 25px; 
+    border: 2px solid var(--green-pastel);
+    box-shadow: 0 4px 10px rgba(53, 84, 46, 0.1);
     cursor: pointer;
     transition: all 0.3s ease-in-out;
 }
 
 .topbar-user:hover {
-    background-color: var(--green-pastel); 
+    background: var(--green-pastel); 
     color: white; 
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(117, 179, 104, 0.4); 
+    transform: translateY(-1px); 
+    box-shadow: 0 6px 15px rgba(117, 179, 104, 0.5);
 }
 
 .topbar-user svg {
@@ -351,24 +364,23 @@ body {
     align-items: center;
     justify-content: center;
     text-decoration: none;
-    
     padding: 8px 18px; 
     height: 40px;
     margin: 0;
-    
-    background-color: var(--red); 
+    background: linear-gradient(145deg, var(--red), #c0392b); 
     color: white;
     font-weight: 600;
-    border-radius: 20px; 
-    
+    border-radius: 25px; 
+    border: none;
+    box-shadow: 0 4px 10px rgba(231, 76, 60, 0.4); 
     cursor: pointer;
     transition: all 0.3s ease-in-out;
 }
 
 .btn-logout:hover {
-    background-color: #c0392b; 
-    transform: translateY(-2px); 
-    box-shadow: 0 6px 15px rgba(231, 76, 60, 0.6); 
+    background: linear-gradient(145deg, #c0392b, #a03024); 
+    transform: translateY(-2px) scale(1.02); 
+    box-shadow: 0 8px 20px rgba(231, 76, 60, 0.8);
 }
 
 .btn-logout svg {
@@ -379,6 +391,13 @@ body {
 .btn-logout:hover svg {
     transform: scale(1.1); 
 }
+
+.content-area {
+    margin-top: 20px;
+    padding: 0 var(--topbar-float-margin) 25px var(--topbar-float-margin); 
+    min-height: calc(100vh - 50px);
+}
+
 /* tampilan untuk menu*/
 .menu-container {
   background: #fff;
