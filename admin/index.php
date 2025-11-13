@@ -1,14 +1,19 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['user_name']) || $_SESSION['user_name'] === 'Guest') {
-    $_SESSION['user_name'] = 'guest_admin'; 
+// Catatan: Pastikan Anda menangani redirect jika pengguna belum login.
+// Biasanya, ini dilakukan di sini:
+/*
+if (!isset($_SESSION['access_token'])) {
+    header('Location: ../auth/login.php');
+    exit;
 }
+*/
 
 $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
 
+// Logic untuk menangani AJAX request pada halaman reservasi
 if ($page === 'reservasi' && isset($_GET['action'])) {
-// untuk menangani request AJAX pada halaman reservasi
     $content_path = '../admin/reservasi/reservasi.php';
 
     if (file_exists($content_path)) {
@@ -16,10 +21,14 @@ if ($page === 'reservasi' && isset($_GET['action'])) {
             ob_start();
         }
         
+        // Memuat konten file reservasi
         include $content_path;
         
+        // Menghentikan output buffer untuk mencegah output yang tidak diinginkan
         ob_end_clean();
         header('Content-Type: application/json');
+        // Seharusnya file reservasi.php yang menangani output JSON dan die(),
+        // Jika sampai di sini berarti ada kesalahan.
         echo json_encode(['success' => false, 'message' => 'Internal server error: AJAX logic did did not exit properly.']);
         die(); 
     } else {
@@ -29,6 +38,7 @@ if ($page === 'reservasi' && isset($_GET['action'])) {
     }
 }
 
+// Penentuan file konten utama
 switch ($page) {
     case 'kuota_pendakian':
         $content = '../admin/kuota_pendakian/kuota_pendakian.php';
@@ -60,7 +70,24 @@ switch ($page) {
         break;
 }
 
-// untuk menampilkan ikon pada sidebar dan topbar
+// --- LOGIC BARU: MENENTUKAN SAPAAN DINAMIS BERDASARKAN WAKTU ---
+$hour = date('H'); // Ambil jam dalam format 24 jam (00 hingga 23)
+$greeting = 'Selamat Datang'; // Sapaan default
+
+if ($hour >= 5 && $hour < 12) {
+    $greeting = 'Selamat Pagi';
+} elseif ($hour >= 12 && $hour < 15) {
+    $greeting = 'Selamat Siang';
+} elseif ($hour >= 15 && $hour < 18) {
+    $greeting = 'Selamat Sore';
+} else {
+    // Termasuk 18:00 (6 PM) hingga 04:59 AM
+    $greeting = 'Selamat Malam';
+}
+// --- AKHIR LOGIC SAPAAN DINAMIS ---
+
+
+// untuk menampilkan ikon pada sidebar dan topbar (Tidak diubah)
 $icon_svg = [
     'dashboard' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M13 9V3h8v6zM3 13V3h8v10zm10 8V11h8v10zM3 21v-6h8v6z"/></svg>',
     'kuota_pendakian' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 512 512"><path fill="currentColor" d="M256.22 18.375c-132.32 0-239.783 107.43-239.783 239.75S123.9 497.905 256.22 497.905S496 390.446 496 258.126S388.54 18.375 256.22 18.375m0 17.875c102.773 0 189.092 69.664 214.374 164.406l-79.313-81.47l-6.967-7.155l-6.688 7.47l-77.22 86.438a1913 1913 0 0 0-34.467-30.063l-6.563-5.625l-6.125 6.156a3510 3510 0 0 0-55.438 57.094l-76.437-83.375l-6.875-7.5l-6.875 7.5l-71.188 77.313C51.364 119.34 143.983 36.25 256.22 36.25m102.25 147.28l-3.845 35.376l21.563-32l10.75 16.688l9.968-8.47l27.188 26.814L417 187.344l19.5 5.062l39.188 40.25l.843-.812a224 224 0 0 1 1.564 26.28c0 37.033-9.06 71.917-25.063 102.595c-46.25-53.48-92.512-100.116-138.75-142.283l11-12.312l33.19-22.594zm-220.16 22.75l26.438 18.782l20.22 22.032c-39.47 42.024-78.63 85.836-115.94 130.344c-21.98-34.443-34.718-75.38-34.718-119.313v-.78l16.25-17.658L87.81 219.5l-17.187 54.063l41.813-51.22l27.312 32.72l-1.438-48.782zm141.375 61.657l53.157 60.938l-7.688-54.563L386.312 315a1632 1632 0 0 1 56.75 62.78l.188-.186C403.853 439.216 334.868 480.03 256.22 480.03c-71.76 0-135.483-33.992-176.033-86.75c19.135-22.91 38.775-45.645 58.72-68.06l56.155-33.814l-29.312 76.75l61.53-73.375l6.25 32.19l19.532-36.783l47.844 69.5l-21.22-91.75z"/></svg>',
@@ -72,8 +99,9 @@ $icon_svg = [
     'user' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 28 28"><path fill="currentColor" d="M9.5 13a4.5 4.5 0 1 0 0-9a4.5 4.5 0 0 0 0 9m14-3.5a3.5 3.5 0 1 1-7 0a3.5 3.5 0 0 1 7 0M2 17.25A2.25 2.25 0 0 1 4.25 15h10.5q.298.001.573.074A7.48 7.48 0 0 0 13 20.5c0 .665.086 1.309.249 1.922c-.975.355-2.203.578-3.749.578C2 23 2 17.75 2 17.75zm14.796-.552a2 2 0 0 1-1.441 2.497l-1.024.253a6.8 6.8 0 0 0 .008 2.152l.976.235a2 2 0 0 1 1.45 2.51l-.324 1.098c.518.46 1.11.835 1.753 1.1l.843-.886a2 2 0 0 1 2.899 0l.85.895a6.2 6.2 0 0 0 1.751-1.09l-.335-1.16a2 2 0 0 1 1.441-2.495l1.026-.254a6.8 6.8 0 0 0-.008-2.152l-.977-.235a2 2 0 0 1-1.45-2.51l.324-1.1a6.2 6.2 0 0 0-1.753-1.1l-.843.888a2 2 0 0 1-2.9 0l-.849-.895a6.2 6.2 0 0 0-1.751 1.09zM20.5 22a1.5 1.5 0 1 1 0-3a1.5 1.5 0 0 1 0 3"/></svg>'
 ];
 
-//untuk menampilkan nama user yang login
-$logged_in_user_name = isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'Guest';
+// Menggunakan $_SESSION['username'] yang berisi nama_lengkap dari login.php
+// Jika sesi tidak ditemukan, gunakan 'Guest' sebagai fallback.
+$logged_in_user_name = isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username']) : 'Guest';
 
 // untuk judul halaman dinamis
 $menu_titles = [
@@ -199,7 +227,9 @@ $current_title = isset($menu_titles[$page]) ? $menu_titles[$page] : 'Dashboard';
                 </div>
                 <div class="topbar-right">
                     <div class="topbar-info">
-                        <span id="topbar-greeting" style="font-size: 0.95em; font-weight: 600; color: #35542E;">Selamat Pagi</span>
+                        <!-- Perubahan di sini: Menggunakan variabel PHP $greeting -->
+                        <span id="topbar-greeting" style="font-size: 0.95em; font-weight: 600; color: #35542E;"><?php echo $greeting; ?></span>
+                        <!-- Asumsi tanggal dan waktu dibuat dinamis oleh JavaScript (script.js) atau kode PHP lainnya -->
                         <span id="current-date" style="margin-top: 5px;">Jumat, 24 Oktober 2025</span>
                         <span id="current-time">14:13:10</span>
                     </div>
