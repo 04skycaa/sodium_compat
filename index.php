@@ -106,21 +106,23 @@
     <section class="py-16 bg-gradient-br-green-blue">
         <div class="container auto-margin px-4">
             <div class="text-center mb-12">
-                <h2 class="text-4xl font-bold text-primary mb-4 animated-border auto-margin" data-translate-key="latest_announcements_title">Pengumuman Terbaru</h2>
+                <h2 class="text-4xl font-bold mb-4 animated-border auto-margin" 
+                    style="color: #75B368 !important;" 
+                    data-translate-key="latest_announcements_title">Pengumuman Terbaru</h2>
                 <p class="text-xl text-gray-600 max-w-3xl auto-margin leading-relaxed" data-translate-key="latest_announcements_subtitle">
                     Informasi penting terkait pendakian Gunung Butak
                 </p>
             </div>
             
             <div id="pengumuman-container" class="max-w-6xl auto-margin">
-                <div class="bg-white rounded-2xl shadow-xl p-8">
+                <div class="bg-white rounded-2xl shadow-xl p-8 **card-announcement**">
                     <div id="pengumuman-content" class="space-y-6">
                         <div id="pengumuman-loading" class="text-center py-12">
                             <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary auto-margin mb-4"></div>
                             <p class="text-gray-600" data-translate-key="loading_announcements">Memuat pengumuman terbaru...</p>
                         </div>
                         <div id="pengumuman-empty" class="hidden text-center py-12">
-                            <i class="fas fa-bullhorn text-5xl text-gray-300 mb-4"></i>
+                            <i class="fas fa-bullhorn text-5xl text-gray-300 mb-4 dark:text-white"></i>
                             <h3 class="text-2xl font-bold text-gray-700 mb-2" data-translate-key="no_announcements_title">Tidak Ada Pengumuman</h3>
                             <p class="text-gray-600" data-translate-key="no_announcements_subtitle">Belum ada pengumuman aktif saat ini</p>
                         </div>
@@ -169,7 +171,7 @@
                             <h3 class="text-5xl font-bold mb-4 text-orange" data-translate-key="difficulty_level">Sulit</h3>
                             <p class="text-2xl font-semibold text-gray-800 mb-4" data-translate-key="difficulty_label">Tingkat Kesulitan</p>
                             <div class="progress-bar difficulty-bar bg-gray-200 w-full auto-margin mb-4 h-8" data-value="80" data-max="100">
-                                <div class="progress-fill bg-gradient-to-r from-orange-400 to-red h-full"></div>
+                                <div class="progress-fill bg-gradient-to-r from-orange-400 to-red h-full" style="--progress-width: 80%;"></div>
                             </div>
                             <p class="text-lg text-gray-600" data-translate-key="difficulty_description">Cocok untuk pendaki berpengalaman</p>
                         </div>
@@ -183,7 +185,7 @@
                             <div class="w-24 h-24 bg-gradient-to-r from-blue-100 to-blue-200 rounded-full flex-display items-center justify-center auto-margin mb-8">
                                 <i class="fas fa-clock text-4xl text-blue-600"></i>
                             </div>
-                            <h3 class="text-6xl font-bold mb-4 gradient-text">3-4</h3>
+                            <h3 class="text-6xl font-bold mb-4 text-accent" style="color: var(--color-accent);">3-4</h3>
                             <p class="text-2xl font-semibold text-gray-800 mb-3" data-translate-key="duration_label">Durasi Pendakian</p>
                             <p class="text-lg text-gray-600" data-translate-key="ideal_duration">Hari Pendakian Ideal</p>
                         </div>
@@ -267,7 +269,7 @@
             </div>
             
             <div class="max-w-5xl auto-margin">
-                <div class="grid-cols-1 lg-grid-cols-2 gap-12 items-center mb-16">
+                <div class="grid-cols-1 md-grid-cols-2 gap-12 items-center mb-16">
                     <div class="feature-card card-hover">
                         <div class="bg-gradient-primary-accent rounded-2xl p-1">
                             <div class="bg-white rounded-2xl p-8">
@@ -352,16 +354,20 @@
                 <!-- Card 1 -->
                 <div class="feature-card card-hover bg-gradient-br-green-blue rounded-3xl shadow-2xl overflow-hidden transition-default group">
                     <div class="h-72 overflow-hidden">
-                        <img src="assets/images/gunung2.jpg" alt="Pemandangan Indah" class="w-full h-full object-cover transition-transform group-hover:scale-110">
-                        <div class="absolute inset-0 bg-gradient-to-r from-green-500 to-blue-600 opacity-0 group-hover:opacity-20 transition-default"></div>
+                        <img src="assets/images/gunung2.jpg" alt="Sabana Luas" class="w-full h-full object-cover transition-transform group-hover:scale-110">
+                        <div class="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 opacity-0 group-hover:opacity-20 transition-default"></div>
                     </div>
+                    
                     <div class="p-8">
-                        <div class="w-16 h-16 bg-gradient-to-r from-green-100 to-green-200 rounded-full flex-display items-center justify-center mb-6 text-green-600 auto-margin">
+                        
+                        <div class="w-16 h-16 bg-gradient-to-r from-blue-100 to-blue-200 rounded-full flex-display items-center justify-center mb-6 text-blue-600 auto-margin">
                             <i class="fas fa-camera text-2xl"></i>
                         </div>
-                        <h3 class="text-3xl font-bold mb-4 text-center text-primary" data-translate-key="beautiful_scenery_title">Pemandangan Indah</h3>
-                        <p class="text-gray-700 text-lg leading-relaxed text-center" data-translate-key="beautiful_scenery_desc">
-                            Nikmati pemandangan alam yang luar biasa dari hutan hingga sabana yang menakjubkan di sepanjang jalur pendakian. 
+                        
+                        <h3 class="text-3xl font-bold mb-4 text-center text-primary" data-translate-key="vast_savanna_title">Pemandangan Indah</h3>
+                        
+                        <p class="text-gray-700 text-lg leading-relaxed text-center" data-translate-key="vast_savanna_desc">
+                           Nikmati pemandangan alam yang luar biasa dari hutan hingga sabana yang menakjubkan di sepanjang jalur pendakian. 
                             Puncak Gunung Butak menawarkan pemandangan 360 derajat yang memukau.
                         </p>
                     </div>
@@ -403,28 +409,28 @@
                     </div>
                 </div>
             </div>
-            
-            <!-- Additional Benefits Section -->
-            <div class="mt-20 bg-gradient-primary-accent rounded-3xl p-12 text-white text-center">
-                <h3 class="text-4xl font-bold mb-6" data-translate-key="climb_benefits_title">Keuntungan Mendaki Bersama Kami</h3>
-                <div class="grid-cols-1 md-grid-cols-3 gap-8 mt-12">
-                    <div class="feature-badge card-hover">
-                        <i class="fas fa-graduation-cap text-5xl mb-4"></i>
-                        <h4 class="text-2xl font-bold mb-3" data-translate-key="certified_guides_title">Pemandu Bersertifikat</h4>
-                        <p class="text-lg opacity-90" data-translate-key="certified_guides_desc">Pemandu profesional dengan sertifikasi nasional</p>
-                    </div>
-                    <div class="feature-badge card-hover">
-                        <i class="fas fa-shield-alt text-5xl mb-4"></i>
-                        <h4 class="text-2xl font-bold mb-3" data-translate-key="guaranteed_safety_title">Keamanan Terjamin</h4>
-                        <p class="text-lg opacity-90" data-translate-key="guaranteed_safety_desc">Sistem keamanan terintegrasi dan SOP ketat</p>
-                    </div>
-                    <div class="feature-badge card-hover">
-                        <i class="fas fa-campground text-5xl mb-4"></i>
-                        <h4 class="text-2xl font-bold mb-3" data-translate-key="complete_basecamp_title">Fasilitas Lengkap</h4>
-                        <p class="text-lg opacity-90" data-translate-key="complete_basecamp_desc">Basecamp lengkap dengan peralatan standar</p>
-                    </div>
+
+            <!--untuk tampilan keuntungan mendaki-->
+            <div class="benefits-section">
+            <h3 class="text-4xl font-bold mb-6" data-translate-key="climb_benefits_title">Keuntungan Mendaki Bersama Kami</h3>
+            <div class="cards-grid-wrapper">
+                <div class="feature-badge card-hover">
+                    <i class="fas fa-graduation-cap text-5xl mb-4"></i>
+                    <h4 class="text-2xl font-bold mb-3" data-translate-key="certified_guides_title">Pemandu Bersertifikat</h4>
+                    <p class="text-lg opacity-90" data-translate-key="certified_guides_desc">Pemandu profesional dengan sertifikasi nasional</p>
+                </div>
+                <div class="feature-badge card-hover">
+                    <i class="fas fa-shield-alt text-5xl mb-4"></i>
+                    <h4 class="text-2xl font-bold mb-3" data-translate-key="guaranteed_safety_title">Keamanan Terjamin</h4>
+                    <p class="text-lg opacity-90" data-translate-key="guaranteed_safety_desc">Sistem keamanan terintegrasi dan SOP ketat</p>
+                </div>
+                <div class="feature-badge card-hover">
+                    <i class="fas fa-campground text-5xl mb-4"></i>
+                    <h4 class="text-2xl font-bold mb-3" data-translate-key="complete_basecamp_title">Fasilitas Lengkap</h4>
+                    <p class="text-lg opacity-90" data-translate-key="complete_basecamp_desc">Basecamp lengkap dengan peralatan standar</p>
                 </div>
             </div>
+        </div>
         </div>
     </section>
 
@@ -432,13 +438,13 @@
     <section class="py-20 bg-gradient-to-br from-white to-gray-100">
         <div class="container auto-margin px-4">
             <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold text-primary mb-4 animated-border auto-margin" data-translate-key="best_time_title">Waktu Terbaik untuk Mendaki</h2>
+                <h2 class="text-4xl font-bold mb-4 animated-border auto-margin title-best-time" data-translate-key="best_time_title">Waktu Terbaik untuk Mendaki</h2>
                 <p class="text-xl text-gray-600 max-w-3xl auto-margin leading-relaxed" data-translate-key="best_time_subtitle">
                     Rencanakan pendakian Anda dengan informasi cuaca dan waktu yang optimal
                 </p>
             </div>
             
-            <div class="grid-cols-1 lg-grid-cols-2 gap-12 max-w-6xl auto-margin">
+            <div class="time-card-grid gap-12 max-w-6xl auto-margin">
                 <!-- Card 1 -->
                 <div class="feature-badge bg-gradient-br-orange-yellow rounded-3xl shadow-2xl p-10 card-hover border-t-4 border-orange-400 overflow-hidden">
                     <div class="text-center mb-8">
@@ -531,119 +537,127 @@
             </div>
             
             <!-- Weather Forecast Section -->
-            <div class="mt-20 bg-gradient-r-green-blue rounded-3xl p-12 text-white text-center">
-                <h3 class="text-4xl font-bold mb-6" data-translate-key="weather_forecast_title">Prakiraan Cuaca Mendatang</h3>
-                <p class="text-xl mb-8 opacity-90" data-translate-key="weather_forecast_subtitle">Cuaca terkini dan perkiraan 3 hari ke depan untuk Gunung Butak</p>
-                
-                <div id="weather-forecast" class="mt-8">
-                    <!-- Weather forecast will be loaded here by JavaScript -->
-                    <div class="flex-display flex-col items-center justify-center py-12">
-                        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white mb-4"></div>
-                        <p class="opacity-90" data-translate-key="loading_weather">Memuat perkiraan cuaca...</p>
+            <div class="weather-container">
+                <div class="main-card">
+                    <header class="header">
+                        <h1>Prakiraan Cuaca Mendatang</h1>
+                        <p>Cuaca terkini dan perkiraan 3 hari ke depan untuk Gunung Butak</p>
+                    </header>
+                    
+                    <div id="weather-forecast" class="forecast-area">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <p>Memuat perkiraan cuaca Gunung Butak...</p>
+                        </div>
                     </div>
+
                 </div>
-            </div>
+    </div>
         </div>
     </section>
 
     <!-- Peta Lokasi -->
-    <section id="lokasi" class="py-20 bg-gradient-to-br from-gray-100 to-white">
-        <div class="container auto-margin px-4">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold text-primary mb-4 animated-border auto-margin" data-translate-key="location_title">Lokasi Gunung Butak</h2>
-                <p class="text-xl text-gray-600 max-w-3xl auto-margin leading-relaxed" data-translate-key="location_subtitle">
-                    Temukan jalur pendakian melalui Basecamp Kucur dan rute terbaik menuju puncak
-                </p>
-            </div>
-            
-            <div class="grid-cols-1 lg-grid-cols-2 gap-16 items-center">
-                <div class="feature-badge card-hover">
-                    <div class="bg-gradient-primary-accent rounded-3xl p-1">
-                        <div class="bg-white rounded-3xl p-10">
-                            <h3 class="text-3xl font-bold mb-8 text-center text-primary" data-translate-key="access_route_title">Rute Akses Menuju Basecamp</h3>
-                            <div class="space-y-6">
-                                <div class="flex-display items-start group p-4 rounded-xl hover:bg-green-50 transition-colors">
-                                    <div class="w-14 h-14 bg-gradient-primary-accent rounded-full flex-display items-center justify-center text-white mr-6 flex-shrink-0">
-                                        <i class="fas fa-map-marker-alt text-xl"></i>
-                                    </div>
-                                    <div>
-                                        <h4 class="font-bold text-xl text-gray-800 mb-2" data-translate-key="basecamp_name">Basecamp Kucur</h4>
-                                        <p class="text-gray-600 text-lg" data-translate-key="basecamp_location">Kabupaten Malang, Jawa Timur</p>
-                                    </div>
+    <section id="lokasi" class="section-location">
+    <div class="container-custom auto-margin px-4">
+        <div class="header-section text-center mb-16">
+            <h2 class="title-main animated-border auto-margin" data-translate-key="location_title">Lokasi Gunung Butak</h2>
+            <p class="subtitle-main" data-translate-key="location_subtitle">
+                Temukan jalur pendakian melalui Basecamp Kucur dan rute terbaik menuju puncak
+            </p>
+        </div>
+        
+        <div class="card-grid-container">
+            <div class="card-lokasi card-rute card-hover">
+                <div class="card-inner-border">
+                    <div class="card-content">
+                        <h3 class="card-title text-center" data-translate-key="access_route_title">Rute Akses Menuju Basecamp</h3>
+                        
+                        <div class="route-list-wrapper">
+                            
+                            <div class="route-item">
+                                <div class="icon-circle icon-bg-hijau">
+                                    <i class="fas fa-map-marker-alt"></i>
                                 </div>
-                                
-                                <div class="flex-display items-start group p-4 rounded-xl hover:bg-green-50 transition-colors">
-                                    <div class="w-14 h-14 bg-gradient-primary-accent rounded-full flex-display items-center justify-center text-white mr-6 flex-shrink-0">
-                                        <i class="fas fa-car text-xl"></i>
-                                    </div>
-                                    <div>
-                                        <h4 class="font-bold text-xl text-gray-800 mb-2" data-translate-key="vehicle_access_title">Akses Kendaraan</h4>
-                                        <p class="text-gray-600 text-lg" data-translate-key="vehicle_access_desc">Dapat dijangkau dengan mobil atau motor, ketinggian 1.200 mdpl</p>
-                                    </div>
-                                </div>
-                                
-                                <div class="flex-display items-start group p-4 rounded-xl hover:bg-green-50 transition-colors">
-                                    <div class="w-14 h-14 bg-gradient-primary-accent rounded-full flex-display items-center justify-center text-white mr-6 flex-shrink-0">
-                                        <i class="fas fa-walking text-xl"></i>
-                                    </div>
-                                    <div>
-                                        <h4 class="font-bold text-xl text-gray-800 mb-2" data-translate-key="climbing_route_title">Jalur Pendakian</h4>
-                                        <p class="text-gray-600 text-lg" data-translate-key="climbing_route_desc">Jalur utama sepanjang 8 km, perkiraan waktu 12-15 jam</p>
-                                    </div>
-                                </div>
-                                
-                                <div class="flex-display items-start group p-4 rounded-xl hover:bg-green-50 transition-colors">
-                                    <div class="w-14 h-14 bg-gradient-primary-accent rounded-full flex-display items-center justify-center text-white mr-6 flex-shrink-0">
-                                        <i class="fas fa-info-circle text-xl"></i>
-                                    </div>
-                                    <div>
-                                        <h4 class="font-bold text-xl text-gray-800 mb-2" data-translate-key="basecamp_facilities_title">Fasilitas Basecamp</h4>
-                                        <p class="text-gray-600 text-lg" data-translate-key="basecamp_facilities_desc">Parkir, toilet, tempat istirahat, dan penyewaan peralatan</p>
-                                    </div>
+                                <div class="route-text-content">
+                                    <h4 class="route-item-title" data-translate-key="basecamp_name">Basecamp Kucur</h4>
+                                    <p class="route-item-desc" data-translate-key="basecamp_location">Kabupaten Malang, Jawa Timur</p>
                                 </div>
                             </div>
                             
-                            <div class="mt-8 p-6 bg-gradient-br-blue-indigo rounded-2xl">
-                                <h4 class="font-bold text-lg text-blue-800 mb-3" data-translate-key="travel_tips_title">Tips Perjalanan:</h4>
-                                <ul class="space-y-2 text-gray-700">
-                                    <li class="flex-display items-start">
-                                        <i class="fas fa-check-circle text-blue-500 mt-1 mr-3"></i>
-                                        <span data-translate-key="tip_1">Waktu tempuh dari Surabaya: 2-3 jam</span>
-                                    </li>
-                                    <li class="flex-display items-start">
-                                        <i class="fas fa-check-circle text-blue-500 mt-1 mr-3"></i>
-                                        <span data-translate-key="tip_2">Parkir aman tersedia di basecamp</span>
-                                    </li>
-                                    <li class="flex-display items-start">
-                                        <i class="fas fa-check-circle text-blue-500 mt-1 mr-3"></i>
-                                        <span data-translate-key="tip_3">Siapkan peralatan sesuai cuaca</span>
-                                    </li>
-                                </ul>
+                            <div class="route-item">
+                                <div class="icon-circle icon-bg-hijau">
+                                    <i class="fas fa-car"></i>
+                                </div>
+                                <div class="route-text-content">
+                                    <h4 class="route-item-title" data-translate-key="vehicle_access_title">Akses Kendaraan</h4>
+                                    <p class="route-item-desc" data-translate-key="vehicle_access_desc">Dapat dijangkau dengan mobil atau motor, ketinggian 1.200 mdpl</p>
+                                </div>
                             </div>
+                            
+                            <div class="route-item">
+                                <div class="icon-circle icon-bg-hijau">
+                                    <i class="fas fa-walking"></i>
+                                </div>
+                                <div class="route-text-content">
+                                    <h4 class="route-item-title" data-translate-key="climbing_route_title">Jalur Pendakian</h4>
+                                    <p class="route-item-desc" data-translate-key="climbing_route_desc">Jalur utama sepanjang 8 km, perkiraan waktu 12-15 jam</p>
+                                </div>
+                            </div>
+                            
+                            <div class="route-item">
+                                <div class="icon-circle icon-bg-hijau">
+                                    <i class="fas fa-info-circle"></i>
+                                </div>
+                                <div class="route-text-content">
+                                    <h4 class="route-item-title" data-translate-key="basecamp_facilities_title">Fasilitas Basecamp</h4>
+                                    <p class="route-item-desc" data-translate-key="basecamp_facilities_desc">Parkir, toilet, tempat istirahat, dan penyewaan peralatan</p>
+                                </div>
+                            </div>
+
                         </div>
-                    </div>
-                </div>
-                
-                <div class="feature-badge card-hover">
-                    <div class="bg-gradient-r-blue-indigo rounded-3xl p-1">
-                        <div class="bg-white rounded-3xl overflow-hidden">
-                            <div class="h-12 bg-gradient-r-blue-indigo"></div>
-                            <div class="p-1">
-                                <iframe 
-                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3957.768447332634!2d112.6028828757616!3d-8.16107007943676!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zOMKwMDknNDAuOSJTIDExMsKwMzYnMTAuNCJF!5e0!3m2!1sen!2sid!4v1650000000000!5m2!1sen!2sid" 
-                                    width="100%" 
-                                    height="500" 
-                                    style="border:0;" 
-                                    allowfullscreen="" 
-                                    loading="lazy" 
-                                    referrerpolicy="no-referrer-when-downgrade">
-                                </iframe>
-                            </div>
+                        
+                        <div class="travel-tips-container">
+                            <h4 class="tips-title" data-translate-key="travel_tips_title">Tips Perjalanan:</h4>
+                            <ul class="tips-list">
+                                <li class="tip-item">
+                                    <i class="fas fa-check-circle tip-icon"></i>
+                                    <span data-translate-key="tip_1">Waktu tempuh dari Surabaya: 2-3 jam</span>
+                                </li>
+                                <li class="tip-item">
+                                    <i class="fas fa-check-circle tip-icon"></i>
+                                    <span data-translate-key="tip_2">Parkir aman tersedia di basecamp</span>
+                                </li>
+                                <li class="tip-item">
+                                    <i class="fas fa-check-circle tip-icon"></i>
+                                    <span data-translate-key="tip_3">Siapkan peralatan sesuai cuaca</span>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
             </div>
             
+            <div class="card-lokasi card-map card-hover">
+                <div class="map-inner-border">
+                    <div class="map-content">
+                        <div class="map-header-bar"></div>
+                        <div class="map-iframe-wrapper">
+                            <iframe 
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3957.768447332634!2d112.6028828757616!3d-8.16107007943676!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zOMKwMDknNDAuOSJTIDExMsKwMzYnMTAuNCJF!5e0!3m2!1sen!2sid!4v1650000000000!5m2!1sen!2sid" 
+                                width="100%" 
+                                height="500" 
+                                style="border:0;" 
+                                allowfullscreen="" 
+                                loading="lazy" 
+                                referrerpolicy="no-referrer-when-downgrade">
+                            </iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>  
             <!-- Interactive Map Features -->
             <div class="mt-20 grid-cols-1 md-grid-cols-3 gap-8">
                 <div class="bg-gradient-br-green-blue rounded-3xl p-8 text-center feature-badge card-hover">
@@ -827,179 +841,7 @@
                 <div id="poster-dots" class="flex-display justify-center mt-8 space-x-2"></div>
             </div>
         </div>
-    </section>
-
-    <!-- Auth Section -->
-    <section id="auth" class="py-20 bg-gradient-br-gray-white">
-        <div class="container auto-margin px-4">
-            <div class="max-w-2xl auto-margin">
-                <div class="text-center mb-12">
-                    <h2 class="text-4xl font-bold text-primary animated-border auto-margin mb-4" data-translate-key="account_access_title">Akses Akun</h2>
-                    <p class="text-gray-600 text-lg" data-translate-key="account_access_subtitle">Login atau daftar untuk mengakses sistem pendakian</p>
-                </div>
-                
-                <div class="feature-badge card-hover">
-                    <div class="bg-gradient-primary-accent rounded-3xl p-1">
-                        <div class="bg-white rounded-3xl shadow-2xl p-1">
-                            <!-- Tabs -->
-                            <div class="border-b border-gray-200">
-                                <nav class="flex-display -mb-px">
-                                    <button id="login-tab" class="py-4 px-6 text-center border-b-2 border-transparent font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300 active text-blue-600 border-blue-600 w-1\/3" data-translate-key="tab_login">
-                                        Login
-                                    </button>
-                                    <button id="register-tab" class="py-4 px-6 text-center border-b-2 border-transparent font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300 w-1\/3" data-translate-key="tab_register">
-                                        Daftar
-                                    </button>
-                                    <button id="forgot-tab" class="py-4 px-6 text-center border-b-2 border-transparent font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300 w-1\/3" data-translate-key="tab_forgot_password">
-                                        Lupa Password
-                                    </button>
-                                </nav>
-                            </div>
-                            
-                            <div class="p-9">
-                                <!-- Login Form -->
-                                <div id="login-content" class="block">
-                                    <div id="login-error-message" class="hidden bg-red-100 border-l-4 border-red-500 text-red-700 px-6 py-4 rounded-lg mb-6"></div>
-                                    <div id="login-success-message" class="hidden bg-green-100 border-l-4 border-green-500 text-green-700 px-6 py-4 rounded-lg mb-6"></div>
-                                    
-                                    <form id="loginForm" class="space-y-6">
-                                        <div>
-                                            <label for="login-email" class="block text-gray-800 text-lg font-bold mb-3" data-translate-key="email_label">Email:</label>
-                                            <div class="relative">
-                                                <div class="absolute inset-y-0 left-0 pl-4 flex-display items-center pointer-events-none">
-                                                    <i class="fas fa-envelope text-gray-400"></i>
-                                                </div>
-                                                <input type="email" id="login-email" class="w-full pl-12 pr-4 py-4 rounded-2xl border border-gray-300 input-style transition-default text-lg" placeholder="Masukkan email Anda" data-translate-key="placeholder_enter_email">
-                                            </div>
-                                        </div>
-                                        
-                                        <div>
-                                            <label for="login-password" class="block text-gray-800 text-lg font-bold mb-3" data-translate-key="password_label">Password:</label>
-                                            <div class="relative">
-                                                <div class="absolute inset-y-0 left-0 pl-4 flex-display items-center pointer-events-none">
-                                                    <i class="fas fa-lock text-gray-400"></i>
-                                                </div>
-                                                <input type="password" id="login-password" class="w-full pl-12 pr-4 py-4 rounded-2xl border border-gray-300 input-style transition-default text-lg" placeholder="Masukkan password Anda" data-translate-key="placeholder_enter_password">
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="flex-display items-center justify-between">
-                                            <div class="flex-display items-center">
-                                                <input type="checkbox" id="remember" class="h-5 w-5 text-accent focus:ring-accent border-gray-300 rounded">
-                                                <label for="remember" class="ml-2 block text-gray-700" data-translate-key="remember_me">Ingat saya</label>
-                                            </div>
-                                            <button type="button" id="forgot-password-link" class="text-accent hover:text-primary font-medium" data-translate-key="forgot_password_link">Lupa password?</button>
-                                        </div>
-                                        
-                                        <button type="submit" class="w-full bg-gradient-primary-accent hover:from-accent hover:to-primary text-white font-bold py-4 px-6 rounded-2xl transition-default hover-scale-105 shadow-2xl text-xl glow-button" data-translate-key="login_now_button">
-                                            <i class="fas fa-sign-in-alt mr-3"></i>Login Sekarang
-                                        </button>
-                                    </form>
-                                    
-                                    <div class="mt-8 text-center">
-                                        <p class="text-gray-600" data-translate-key="no_account_yet">Belum punya akun? <button type="button" id="show-register" class="text-accent hover:text-primary font-bold" data-translate-key="register_here">Daftar di sini</button></p>
-                                    </div>
-                                </div>
-                                
-                                <!-- Register Form -->
-                                <div id="register-content" class="hidden">
-                                    <div id="register-error-message" class="hidden bg-red-100 border-l-4 border-red-500 text-red-700 px-6 py-4 rounded-lg mb-6"></div>
-                                    <div id="register-success-message" class="hidden bg-green-100 border-l-4 border-green-500 text-green-700 px-6 py-4 rounded-lg mb-6"></div>
-                                    
-                                    <form id="registerForm" class="space-y-6">
-                                        <div>
-                                            <label for="register-name" class="block text-gray-800 text-lg font-bold mb-3" data-translate-key="full_name_label">Nama Lengkap:</label>
-                                            <div class="relative">
-                                                <div class="absolute inset-y-0 left-0 pl-4 flex-display items-center pointer-events-none">
-                                                    <i class="fas fa-user text-gray-400"></i>
-                                                </div>
-                                                <input type="text" id="register-name" class="w-full pl-12 pr-4 py-4 rounded-2xl border border-gray-300 input-style transition-default text-lg" placeholder="Masukkan nama lengkap Anda" data-translate-key="placeholder_enter_full_name">
-                                            </div>
-                                        </div>
-                                        
-                                        <div>
-                                            <label for="register-email" class="block text-gray-800 text-lg font-bold mb-3" data-translate-key="email_label_2">Email:</label>
-                                            <div class="relative">
-                                                <div class="absolute inset-y-0 left-0 pl-4 flex-display items-center pointer-events-none">
-                                                    <i class="fas fa-envelope text-gray-400"></i>
-                                                </div>
-                                                <input type="email" id="register-email" class="w-full pl-12 pr-4 py-4 rounded-2xl border border-gray-300 input-style transition-default text-lg" placeholder="Masukkan email Anda" data-translate-key="placeholder_enter_email_2">
-                                            </div>
-                                        </div>
-                                        
-                                        <div>
-                                            <label for="register-phone" class="block text-gray-800 text-lg font-bold mb-3" data-translate-key="phone_number_label">Nomor Telepon:</label>
-                                            <div class="relative">
-                                                <div class="absolute inset-y-0 left-0 pl-4 flex-display items-center pointer-events-none">
-                                                    <i class="fas fa-phone text-gray-400"></i>
-                                                </div>
-                                                <input type="tel" id="register-phone" class="w-full pl-12 pr-4 py-4 rounded-2xl border border-gray-300 input-style transition-default text-lg" placeholder="Masukkan nomor telepon Anda" data-translate-key="placeholder_enter_phone">
-                                            </div>
-                                        </div>
-                                        
-                                        <div>
-                                            <label for="register-password" class="block text-gray-800 text-lg font-bold mb-3" data-translate-key="password_label_2">Password:</label>
-                                            <div class="relative">
-                                                <div class="absolute inset-y-0 left-0 pl-4 flex-display items-center pointer-events-none">
-                                                    <i class="fas fa-lock text-gray-400"></i>
-                                                </div>
-                                                <input type="password" id="register-password" class="w-full pl-12 pr-4 py-4 rounded-2xl border border-gray-300 input-style transition-default text-lg" placeholder="Masukkan password Anda" data-translate-key="placeholder_enter_password_2">
-                                            </div>
-                                        </div>
-                                        
-                                        <div>
-                                            <label for="register-confirm-password" class="block text-gray-800 text-lg font-bold mb-3" data-translate-key="confirm_password_label">Konfirmasi Password:</label>
-                                            <div class="relative">
-                                                <div class="absolute inset-y-0 left-0 pl-4 flex-display items-center pointer-events-none">
-                                                    <i class="fas fa-lock text-gray-400"></i>
-                                                </div>
-                                                <input type="password" id="register-confirm-password" class="w-full pl-12 pr-4 py-4 rounded-2xl border border-gray-300 input-style transition-default text-lg" placeholder="Konfirmasi password Anda" data-translate-key="placeholder_confirm_password">
-                                            </div>
-                                        </div>
-                                        
-                                        <button type="submit" class="w-full bg-gradient-primary-accent hover:from-accent hover:to-primary text-white font-bold py-4 px-6 rounded-2xl transition-default hover-scale-105 shadow-2xl text-xl glow-button" data-translate-key="register_now_button">
-                                            <i class="fas fa-user-plus mr-3"></i>Daftar Sekarang
-                                        </button>
-                                    </form>
-                                    
-                                    <div class="mt-8 text-center">
-                                        <p class="text-gray-600" data-translate-key="already_have_account">Sudah punya akun? <button type="button" id="show-login" class="text-accent hover:text-primary font-bold" data-translate-key="login_here_2">Login di sini</button></p>
-                                    </div>
-                                </div>
-                                
-                                <!-- Forgot Password Form -->
-                                <div id="forgot-content" class="hidden">
-                                    <div id="forgot-error-message" class="hidden bg-red-100 border-l-4 border-red-500 text-red-700 px-6 py-4 rounded-lg mb-6"></div>
-                                    <div id="forgot-success-message" class="hidden bg-green-100 border-l-4 border-green-500 text-green-700 px-6 py-4 rounded-lg mb-6"></div>
-                                    
-                                    <form id="forgotForm" class="space-y-6">
-                                        <div>
-                                            <label for="forgot-email" class="block text-gray-800 text-lg font-bold mb-3" data-translate-key="email_label_3">Email:</label>
-                                            <div class="relative">
-                                                <div class="absolute inset-y-0 left-0 pl-4 flex-display items-center pointer-events-none">
-                                                    <i class="fas fa-envelope text-gray-400"></i>
-                                                </div>
-                                                <input type="email" id="forgot-email" class="w-full pl-12 pr-4 py-4 rounded-2xl border border-gray-300 input-style transition-default text-lg" placeholder="Masukkan email Anda" data-translate-key="placeholder_enter_email_3">
-                                            </div>
-                                        </div>
-                                        
-                                        <p class="text-gray-600 text-sm" data-translate-key="verification_code_info">Kami akan mengirimkan kode verifikasi ke email Anda. Masukkan kode tersebut untuk mereset password Anda.</p>
-                                        
-                                        <button type="submit" class="w-full bg-gradient-primary-accent hover:from-accent hover:to-primary text-white font-bold py-4 px-6 rounded-2xl transition-default hover-scale-105 shadow-2xl text-xl glow-button" data-translate-key="send_verification_button">
-                                            <i class="fas fa-paper-plane mr-3"></i>Kirim Kode Verifikasi
-                                        </button>
-                                    </form>
-                                    
-                                    <div class="mt-8 text-center">
-                                        <p class="text-gray-600" data-translate-key="back_to_login">Ingin kembali ke login? <button type="button" id="show-login-from-forgot" class="text-accent hover:text-primary font-bold" data-translate-key="login_here_3">Login di sini</button></p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        
     </section>
 
     <!-- Footer -->
@@ -1049,7 +891,7 @@
                     <h4 class="text-lg font-bold mb-6" data-translate-key="climbing_info_title">Jalur Pendakian</h4>
                     <ul class="space-y-3 text-gray-300">
                         <li class="flex-display items-start">
-                            <i class="fas fa-mountain mt-1 mr-2 text-accent"></i>
+                            <i class="fas fa-map-marker-alt mt-1 mr-2 text-accent"></i>
                             <span data-translate-key="info_route">Jalur Utama: Kucur</span>
                         </li>
                         <li class="flex-display items-start">
@@ -1358,6 +1200,31 @@
             const savedLang = localStorage.getItem('lang') || 'id';
             applyTranslation(savedLang);
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.feature-card');
+            
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const card = entry.target;
+                        const index = Array.from(cards).indexOf(card);
+                        
+                        // Add a sequential delay based on the card's position
+                        setTimeout(() => {
+                            card.classList.add('is-visible');
+                            observer.unobserve(card); // Stop observing once it's visible
+                        }, index * 200); // 200ms delay between each card
+                    }
+                });
+            }, {
+                threshold: 0.1 // Triggers when 10% of the card is visible
+            });
+
+            cards.forEach(card => {
+                observer.observe(card);
+            });
+        });
 
         // --- INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', function() {
