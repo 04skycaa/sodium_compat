@@ -26,14 +26,32 @@ if (empty($jumlah) || empty($tanggal) || empty($keterangan) || empty($id_kategor
     exit;
 }
 
-// Siapkan data untuk dikirim ke Supabase
+// === PERBAIKAN DIMULAI DI SINI ===
+
+// 1. Validasi Sesi: Pastikan admin sudah login
+// (Asumsi UUID admin disimpan di 'user_id' saat login)
+if (!isset($_SESSION['user_id'])) {
+    $tab = ($form_action == 'tambah') ? 'tambah' : 'laporan';
+    $_SESSION['toast_status'] = 'error';
+    $_SESSION['toast_message'] = 'Sesi Anda tidak valid. Silakan login kembali.';
+    header('Location: ../index.php?page=pembukuan&tab=' . $tab);
+    exit;
+}
+
+// 2. Siapkan data untuk dikirim ke Supabase
 $data_to_send = [
     'jumlah' => $jumlah,
     'tanggal_pengeluaran' => $tanggal,
     'keterangan' => $keterangan,
-    'id_kategori' => $id_kategori
-    // 'id_user' => $_SESSION['user_id'] // Jika Anda punya sistem login, tambahkan ini
+    'id_kategori' => $id_kategori,
+    
+    // PERBAIKAN: Menambahkan 'id_admin' dari Sesi.
+    // Nama kolom di database Anda adalah 'id_admin'.
+    'id_admin' => $_SESSION['user_id'] 
 ];
+
+// === PERBAIKAN SELESAI ===
+
 
 $result = null;
 

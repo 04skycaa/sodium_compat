@@ -215,6 +215,11 @@ $kategori_options = $kategori_data && !isset($kategori_data['error']) ? $kategor
                                     <button class="btn btn-icon btn-edit" data-id="<?= $trans['id'] ?>" title="Edit">
                                         <i class="fa-solid fa-pencil"></i>
                                     </button>
+                                    
+                                    <!-- TOMBOL HAPUS BARU DITAMBAHKAN DI SINI -->
+                                    <button class="btn btn-icon btn-delete" data-id="<?= $trans['id'] ?>" title="Hapus">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
                                 </td>
                             </tr>
                         <?php 
@@ -336,5 +341,71 @@ $kategori_options = $kategori_data && !isset($kategori_data['error']) ? $kategor
 </div>
 
 <script src="/simaksi/assets/js/pembukuan.js"></script>
+
+<!-- ================================================== -->
+<!-- SCRIPT UNTUK MENAMPILKAN NOTIFIKASI (TOAST) DARI PHP -->
+<!-- ================================================== -->
+<?php
+if (isset($_SESSION['toast_status']) && isset($_SESSION['toast_message'])) {
+    $status = $_SESSION['toast_status'];
+    $message = $_SESSION['toast_message'];
+    
+    // Hapus session agar tidak muncul lagi
+    unset($_SESSION['toast_status']);
+    unset($_SESSION['toast_message']);
+?>
+<script>
+    // Pastikan DOM sudah siap
+    document.addEventListener('DOMContentLoaded', function() {
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: '<?php echo $status; ?>', // 'success' atau 'error'
+            title: '<?php echo $message; ?>',
+            showConfirmButton: false,
+            timer: 3500, // Tampil selama 3.5 detik
+            timerProgressBar: true
+        });
+    });
+</script>
+<?php
+}
+?>
+
+<!-- ================================================== -->
+<!-- SCRIPT UNTUK KONFIRMASI HAPUS DATA -->
+<!-- ================================================== -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Cari semua tombol hapus
+    const deleteButtons = document.querySelectorAll('.btn-delete');
+    
+    // Tambahkan listener untuk setiap tombol
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault(); // Mencegah aksi default
+            
+            const id = this.getAttribute('data-id');
+            
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Data yang sudah dihapus tidak dapat dikembalikan!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, hapus data!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Jika dikonfirmasi, arahkan ke skrip penghapusan
+                    window.location.href = 'pembukuan/proses_hapus.php?id=' + id;
+                }
+            });
+        });
+    });
+});
+</script>
+
 </body>
 </html>
