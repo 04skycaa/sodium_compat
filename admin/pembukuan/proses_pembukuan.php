@@ -1,89 +1,83 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+session_start();
+include __DIR__ . '/../../config/supabase.php';
 
-require __DIR__ . '/../../config/supabase.php';
-header('Content-Type: application/json');
-
+// Cek apakah method POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(['success' => false, 'message' => 'Metode tidak diizinkan.']);
+    header('Location: ../index.php?page=pembukuan&tab=laporan&status=error&msg=Invalid request');
     exit;
 }
 
-$action = $_POST['form_action'] ?? null;
-switch ($action) {
-    case 'tambah':
-        tambahPengeluaran();
-        break;
-    case 'edit':
-        editPengeluaran();
-        break;
-    default:
-        echo json_encode(['success' => false, 'message' => 'Aksi tidak valid.']);
-        break;
+// Ambil data dari form
+$form_action = $_POST['form_action'] ?? '';
+$jumlah = $_POST['jumlah'] ?? 0;
+$tanggal = $_POST['tanggal_pengeluaran'] ?? '';
+$keterangan = $_POST['keterangan'] ?? '';
+$id_kategori = $_POST['id_kategori'] ?? null;
+$id_pengeluaran = $_POST['id_pengeluaran'] ?? null; // Hanya ada saat edit
+
+// Validasi dasar
+if (empty($jumlah) || empty($tanggal) || empty($keterangan) || empty($id_kategori)) {
+    $tab = ($form_action == 'tambah') ? 'tambah' : 'laporan';
+    // Set pesan error di session
+    $_SESSION['toast_status'] = 'error';
+    $_SESSION['toast_message'] = 'Semua field wajib diisi.';
+    header('Location: ../index.php?page=pembukuan&tab=' . $tab);
+    exit;
 }
 
-function tambahPengeluaran() {
-    // PERUBAHAN: Menggunakan 'tanggal_pengeluaran' dari form
-    $tanggal = $_POST['tanggal_pengeluaran'] ?? '';
-    $jumlah = $_POST['jumlah'] ?? '';
-    $keterangan = $_POST['keterangan'] ?? '';
-    
-    // Ganti dengan ID admin dari sesi login Anda
-    $id_admin = '3b3e7f63-30dd-4ce0-bd31-95d9...'; 
-    $id_kat = 1; // Default kategori sesuai database Anda
+// Siapkan data untuk dikirim ke Supabase
+$data_to_send = [
+    'jumlah' => $jumlah,
+    'tanggal_pengeluaran' => $tanggal,
+    'keterangan' => $keterangan,
+    'id_kategori' => $id_kategori
+    // 'id_user' => $_SESSION['user_id'] // Jika Anda punya sistem login, tambahkan ini
+];
 
-    if (empty($tanggal) || empty($jumlah) || empty($keterangan)) {
-        echo json_encode(['success' => false, 'message' => 'Semua field wajib diisi.']);
-        return;
-    }
-    
-    $data = [
-        // PERUBAHAN: Menyesuaikan nama kolom DB
-        'tanggal_pengeluaran' => $tanggal,
-        'jumlah' => $jumlah,
-        'keterangan' => $keterangan,
-        'id_admin' => $id_admin,
-        'id_kat' => $id_kat
-    ];
+$result = null;
 
-    $result = supabase_request('POST', 'pengeluaran', $data);
+if ($form_action == 'tambah') {
+    // ==================
+    // LOGIKA TAMBAH DATA
+    // ==================
+    $result = supabase_request('POST', 'pengeluaran', $data_to_send);
+    // PERBAIKAN: Redirect ke tab Laporan agar data baru terlihat
+    $tab_redirect = 'laporan'; 
+    $success_msg = 'Pengeluaran baru berhasil dicatat';
+    $error_msg = 'Gagal mencatat pengeluaran';
 
-    if (isset($result['error']) || !$result) {
-        $errorMessage = $result['message'] ?? 'Gagal menambahkan data.';
-        echo json_encode(['success' => false, 'message' => $errorMessage]);
-    } else {
-        echo json_encode(['success' => true, 'message' => 'Data pengeluaran berhasil ditambahkan.']);
-    }
+} elseif ($form_action == 'edit' && !empty($id_pengeluaran)) {
+    // ==================
+    // LOGIKA EDIT DATA
+    // ==================
+    // Gunakan method PATCH dan filter ID
+    $result = supabase_request('PATCH', 'pengeluaran?id_pengeluaran=eq.' . $id_pengeluaran, $data_to_send);
+    $tab_redirect = 'laporan'; // Kembali ke tab laporan
+    $success_msg = 'Data pengeluaran berhasil diperbarui';
+    $error_msg = 'Gagal memperbarui data pengeluaran';
+
+} else {
+    // Action tidak valid
+    $_SESSION['toast_status'] = 'error';
+    $_SESSION['toast_message'] = 'Aksi tidak valid';
+    header('Location: ../index.php?page=pembukuan&tab=laporan');
+    exit;
 }
 
-function editPengeluaran() {
-    // PERUBAHAN: Menggunakan 'id_pengeluaran' dan 'tanggal_pengeluaran'
-    $id = $_POST['id_pengeluaran'] ?? '';
-    $tanggal = $_POST['tanggal_pengeluaran'] ?? '';
-    $jumlah = $_POST['jumlah'] ?? '';
-    $keterangan = $_POST['keterangan'] ?? '';
-
-    if (empty($id) || empty($tanggal) || empty($jumlah) || empty($keterangan)) {
-        echo json_encode(['success' => false, 'message' => 'Data tidak lengkap untuk diedit.']);
-        return;
-    }
-
-    $data = [
-        // PERUBAHAN: Menyesuaikan nama kolom DB
-        'tanggal_pengeluaran' => $tanggal,
-        'jumlah' => $jumlah,
-        'keterangan' => $keterangan,
-    ];
-
-    // PERUBAHAN: Menggunakan 'id_pengeluaran' untuk query
-    $result = supabase_request('PATCH', 'pengeluaran?id_pengeluaran=eq.' . $id, $data);
-
-    if (!$result || isset($result['error'])) {
-        $errorMessage = $result['message'] ?? 'Gagal memperbarui data.';
-        echo json_encode(['success' => false, 'message' => $errorMessage]);
-    } else {
-        echo json_encode(['success' => true, 'message' => 'Data pengeluaran berhasil diperbarui.']);
-    }
+// Cek hasil request
+if ($result && !isset($result['error'])) {
+    // Berhasil
+    $_SESSION['toast_status'] = 'success';
+    $_SESSION['toast_message'] = $success_msg;
+    header('Location: ../index.php?page=pembukuan&tab=' . $tab_redirect);
+    exit;
+} else {
+    // Gagal
+    $api_error = $result['message'] ?? $error_msg;
+    $_SESSION['toast_status'] = 'error';
+    $_SESSION['toast_message'] = $api_error;
+    header('Location: ../index.php?page=pembukuan&tab=' . $tab_redirect);
+    exit;
 }
 ?>
