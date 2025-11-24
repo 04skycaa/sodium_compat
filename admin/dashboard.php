@@ -1,19 +1,9 @@
 <?php
 include __DIR__ . '/../config/supabase.php';
-
 date_default_timezone_set('Asia/Jakarta'); 
-
-/**
- * Fungsi pembantu untuk mengambil data dari Supabase menggunakan fungsi di supabase.php
- * @param string $tableName Nama tabel Supabase.
- * @param string $filters Filter Supabase (misalnya 'tanggal_pendakian=eq.2025-11-05&select=id').
- * @param array $extraHeaders Header tambahan jika diperlukan (misalnya untuk count)
- * @return array Hasil data yang diambil.
- */
 
 function fetchData($tableName, $filters = '', $extraHeaders = []) {
     $response = supabase_request('GET', $tableName . '?' . $filters, null, $extraHeaders);
-    
     if (isset($response['error'])) {
         error_log("Gagal fetch data dari tabel {$tableName}: " . ($response['error']['message'] ?? 'Kesalahan tidak diketahui.'));
         return [];
@@ -21,42 +11,39 @@ function fetchData($tableName, $filters = '', $extraHeaders = []) {
     return $response;
 }
 
-//untuk tanggal hari ini, awal bulan ini, dan 7 hari terakhir
 $today_date = date('Y-m-d'); 
-$first_day_of_month = date('Y-m-01'); 
-$last_7_days = date('Y-m-d', strtotime('-7 days'));
 
-// untuk menyimpan data metrik
-$reservasi_hari_ini_raw = fetchData('reservasi', 'tanggal_pendakian=eq.' . $today_date . '&select=id_reservasi');
-$total_reservasi_hari_ini = count($reservasi_hari_ini_raw);
+// 6 hari yang lalu, untuk mendapatkan total 7 hari (6 hari lalu + hari ini)
+$start_date_7_hari = date('Y-m-d', strtotime('-6 days')); 
 
-// untuk menghitung total pendaki hari ini
-$pendaki_hari_ini_raw = fetchData('pendaki_rombongan', 'tanggal_registrasi=eq.' . $today_date . '&select=id_pendaki');
-$total_pendaki_hari_ini = count($pendaki_hari_ini_raw);
+// untuk menyimpan data metrik (7 HARI)
+$reservasi_minggu_ini_raw = fetchData('reservasi', 'tanggal_pendakian=gte.' . $start_date_7_hari . '&select=id_reservasi');
+$total_reservasi_minggu_ini = count($reservasi_minggu_ini_raw);
 
-// untuk menghitung sisa kuota hari ini
-$kuota_harian_data = fetchData('kuota_harian', 'tanggal_kuota=eq.' . $today_date . '&select=kuota_maksimal,kuota_terpakai');
+// Mengambil data jumlah pendaki dari tabel reservasi
+$pendaki_minggu_ini_raw = fetchData('reservasi', 'tanggal_pendakian=gte.' . $start_date_7_hari . '&select=jumlah_pendaki');
+
+// Menjumlahkan semua nilai dari kolom 'jumlah_pendaki'
+$total_pendaki_minggu_ini = array_sum(array_column($pendaki_minggu_ini_raw, 'jumlah_pendaki'));
+
+// untuk menghitung sisa kuota (TETAP HARI INI)
+$kuota_harian_data = fetchData('kuota_harian', 'tanggal_kuota=eq.' . $today_date . '&select=kuota_maksimal,kuota_terpesan');
 $sisa_kuota = 0;
 if (!empty($kuota_harian_data)) {
     $max = $kuota_harian_data[0]['kuota_maksimal'] ?? 0;
-    $terpakai = $kuota_harian_data[0]['kuota_terpakai'] ?? 0;
+    $terpakai = $kuota_harian_data[0]['kuota_terpesan'] ?? 0;
     $sisa_kuota = $max - $terpakai;
 }
 
-// untuk menghitung total pemasukan hari ini
-$pemasukan_hari_ini_raw = fetchData('pemasukan', "tanggal_pemasukan=eq." . $today_date . '&select=jumlah');
-$total_pemasukan_hari_ini = array_sum(array_column($pemasukan_hari_ini_raw, 'jumlah'));
-
-
-// untuk mengambil 5 aktivitas reservasi terbaru  
-$aktivitas_terbaru_raw = fetchData('reservasi', 'order=created_at.desc&limit=5&select=created_at,id_reservasi,status_reservasi');
+// untuk menghitung total pemasukan (7 HARI)
+$pemasukan_minggu_ini_raw = fetchData('pemasukan', "tanggal_pemasukan=gte." . $start_date_7_hari . '&select=jumlah');
+$total_pemasukan_minggu_ini = array_sum(array_column($pemasukan_minggu_ini_raw, 'jumlah'));
+$aktivitas_terbaru_raw = fetchData('reservasi', 'order=dipesan_pada.desc&limit=5&select=dipesan_pada,id_reservasi,status,kode_reservasi');
 $aktivitas_terbaru = [];
-
 foreach ($aktivitas_terbaru_raw as $res) {
-    $status = $res['status_reservasi'] ?? 'menunggu_konfirmasi';
+    $status = $res['status'] ?? 'menunggu_konfirmasi';
     $icon = '';
     $action_text = '';
-
     if ($status === 'terkonfirmasi') {
         $action_text = "Terkonfirmasi";
         $icon = 'line-md:person-add';
@@ -73,77 +60,66 @@ foreach ($aktivitas_terbaru_raw as $res) {
         $action_text = "Status: " . ucfirst($status);
         $icon = 'line-md:loading-loop';
     }
-
     $aktivitas_terbaru[] = [
-        'waktu' => date('d M Y H:i', strtotime($res['created_at'])), 
+        'waktu' => date('d M Y H:i', strtotime($res['dipesan_pada'])), 
         'aksi' => $action_text,
-        'kode_booking' => $res['id_reservasi'] ?? 'N/A',
+        'kode_reservasi' => $res['kode_reservasi'] ?? 'N/A', 
         'icon' => $icon,
         'status' => $status
     ];
 }
-
-
-// untuk menghitung status reservasi bulan ini
-$reservations_this_month = fetchData('reservasi', "tanggal_pendakian=gte." . $first_day_of_month . '&select=status_reservasi');
-
+// diagram status reservasi mingguan (7 HARI)
+$reservations_this_week = fetchData('reservasi', "tanggal_pendakian=gte." . $start_date_7_hari . '&select=status');
 $status_counts = [
     'terkonfirmasi' => 0,
     'menunggu_pembayaran' => 0,
     'dibatalkan' => 0,
     'selesai' => 0,
 ];
-
-foreach ($reservations_this_month as $res) {
-    $status = strtolower($res['status_reservasi'] ?? '');
+foreach ($reservations_this_week as $res) {
+    $status = strtolower($res['status'] ?? '');
     if (isset($status_counts[$status])) {
         $status_counts[$status]++;
     }
 }
 
-
-// untuk data pendapatan dan pengeluaran bulanan serta 7 hari terakhir
+// grafik pendapatan mingguan (7 HARI)
 $date_range = [];
-for ($i = 0; $i < 8; $i++) {
+for ($i = 0; $i < 7; $i++) {
     $date_range[] = date('Y-m-d', strtotime("-$i days"));
 }
 $date_range = array_reverse($date_range); 
-
 $pendapatan_harian_labels = []; 
 $pemasukan_harian_data = array_fill_keys($date_range, 0);
 $pengeluaran_harian_data = array_fill_keys($date_range, 0);
-
 foreach ($date_range as $date) {
     $pendapatan_harian_labels[] = date('j M', strtotime($date)); 
 }
 
-// untuk proses pemasukan (bulanan dan 7 hari)
-$pemasukan_bulanan_raw = fetchData('pemasukan', "tanggal_pemasukan=gte." . $first_day_of_month . '&select=tanggal_pemasukan,jumlah');
-$total_pemasukan_bulanan = array_sum(array_column($pemasukan_bulanan_raw, 'jumlah'));
-
-foreach ($pemasukan_bulanan_raw as $data) {
+// Ambil data Pemasukan 7 hari terakhir
+$pemasukan_mingguan_raw = fetchData('pemasukan', "tanggal_pemasukan=gte." . $start_date_7_hari . '&select=tanggal_pemasukan,jumlah');
+$total_pemasukan_mingguan = array_sum(array_column($pemasukan_mingguan_raw, 'jumlah'));
+foreach ($pemasukan_mingguan_raw as $data) {
     $date_only = substr($data['tanggal_pemasukan'], 0, 10); 
     if (isset($pemasukan_harian_data[$date_only])) {
         $pemasukan_harian_data[$date_only] += $data['jumlah'];
     }
 }
 
-// untuk proses pengeluaran (bulanan dan 7 hari)
-$pengeluaran_bulanan_raw = fetchData('pengeluaran', "tanggal_pengeluaran=gte." . $first_day_of_month . '&select=tanggal_pengeluaran,jumlah');
-$total_pengeluaran_bulanan = array_sum(array_column($pengeluaran_bulanan_raw, 'jumlah'));
-
-foreach ($pengeluaran_bulanan_raw as $data) {
+// Ambil data Pengeluaran 7 hari terakhir
+$pengeluaran_mingguan_raw = fetchData('pengeluaran', "tanggal_pengeluaran=gte." . $start_date_7_hari . '&select=tanggal_pengeluaran,jumlah');
+$total_pengeluaran_mingguan = array_sum(array_column($pengeluaran_mingguan_raw, 'jumlah'));
+foreach ($pengeluaran_mingguan_raw as $data) {
     $date_only = substr($data['tanggal_pengeluaran'], 0, 10); 
     if (isset($pengeluaran_harian_data[$date_only])) {
         $pengeluaran_harian_data[$date_only] += $data['jumlah'];
     }
 }
 
-// untuk menyiapkan data JSON untuk JavaScript
-
+// untuk mengirim data ke JavaScript
 $js_data = [
-    'pemasukan' => $total_pemasukan_bulanan,
-    'pengeluaran' => $total_pengeluaran_bulanan, 
+    'pemasukan' => $total_pemasukan_mingguan, 
+    'pengeluaran' => $total_pengeluaran_mingguan, 
     'aktivitas' => $aktivitas_terbaru,
     'reservasiStatus' => $status_counts,
     'pendapatanHarian' => [ 
@@ -152,9 +128,7 @@ $js_data = [
         'pengeluaran' => array_values($pengeluaran_harian_data)
     ]
 ];
-
 $json_data = json_encode($js_data);
-
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -445,14 +419,14 @@ $json_data = json_encode($js_data);
                 
                 <div class="metric-card card">
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="currentColor" d="M1 11.59A3.59 3.59 0 0 1 4.59 8h11.75a3.59 3.59 0 0 1 3.59 3.59v3.727c.543 1.424 1.743 2.317 2.939 2.87a9.3 9.3 0 0 0 2.097.675l.127.022l.03.005h.002l.025.003l.026.005a7.15 7.15 0 0 1 5.756 6.033h.028v.23a7 7 0 0 1 .04.782v.868q0 .248-.04.486v.141c.078.415.07.886-.122 1.375a3.05 3.05 0 0 1-2.579 2.162h-.002a3.03 3.03 0 0 1-2.716-1.149a3.03 3.03 0 0 1-4.779-.001a3.03 3.03 0 0 1-2.392 1.166a3.02 3.02 0 0 1-2.388-1.166a3.03 3.03 0 0 1-2.392 1.166a3.02 3.02 0 0 1-2.388-1.166a3.03 3.03 0 0 1-4.78 0A3.031 3.031 0 0 1 1 27.96zm27.905 13.34a5.15 5.15 0 0 0-4.08-4.064l-.046-.006l-.18-.032a11.3 11.3 0 0 1-2.57-.826c-1.309-.605-2.868-1.66-3.74-3.447l-2.062.035a1 1 0 0 1-.034-2l1.737-.029V13.34l-1.707.02a1 1 0 1 1-.025-1.999l1.712-.021A1.59 1.59 0 0 0 16.34 10h-4.98v1.91a2.43 2.43 0 0 1-2.43 2.43H3v10.59z"/></svg>
-                    <p>Total Reservasi Hari Ini</p> 
-                    <h2 id="total-reservasi-hari-ini"><?= number_format($total_reservasi_hari_ini, 0, ',', '.') ?></h2> 
+                    <p>Total Reservasi (7 Hari)</p> 
+                    <h2 id="total-reservasi-minggu-ini"><?= number_format($total_reservasi_minggu_ini, 0, ',', '.') ?></h2> 
                 </div>
                 
                 <div class="metric-card card">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="m7 23l3.075-15.55q.15-.725.675-1.088T11.85 6t1.063.25t.787.75l1 1.6q.45.725 1.163 1.313t1.637.862V9H19v14h-1.5V12.85q-1.2-.275-2.225-.875T13.5 10.5l-.6 3l2.1 2V23h-2v-6l-2.1-2l-1.8 8zm.425-9.875l-2.125-.4q-.4-.075-.625-.413t-.15-.762l.75-3.925q.15-.8.85-1.263t1.5-.312l1.15.225zM13.5 5.5q-.825 0-1.412-.587T11.5 3.5t.588-1.412T13.5 1.5t1.413.588T15.5 3.5t-.587 1.413T13.5 5.5"/></svg>
-                    <p>Total Pendaki Hari Ini</p>
-                    <h2 id="total-pendaki-hari-ini"><?= number_format($total_pendaki_hari_ini, 0, ',', '.') ?></h2> 
+                    <p>Total Pendaki (7 Hari)</p>
+                    <h2 id="total-pendaki-minggu-ini"><?= number_format($total_pendaki_minggu_ini, 0, ',', '.') ?></h2> 
                 </div>
 
                 <div class="metric-card card">
@@ -463,15 +437,15 @@ $json_data = json_encode($js_data);
 
                 <div class="metric-card card">
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M12 21a9 9 0 1 1 0-18a9 9 0 0 1 0 18m.5-8.5V9.5h-1v4l3.5 3.5l.7-.7l-3.2-3.3"/></svg>
-                    <p>Total Pemasukan Hari Ini</p>
-                    <h2 id="total-pemasukan-hari-ini">Rp <?= number_format($total_pemasukan_hari_ini, 0, ',', '.') ?></h2> 
+                    <p>Total Pemasukan (7 Hari)</p>
+                    <h2 id="total-pemasukan-minggu-ini">Rp <?= number_format($total_pemasukan_minggu_ini, 0, ',', '.') ?></h2> 
                 </div>
             </div>
 
             <div class="diagram-keuangan card">
             <h3 style="display: flex; align-items: center;">
                 <span class="iconify iconify-md" data-icon="ant-design:pie-chart-filled" style="color: var(--color-secondary); margin-right: 8px;"></span>
-                Diagram Status Reservasi Bulan Ini 
+                Diagram Status Reservasi (7 Hari)
             </h3>
                 <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;">
                     <div style="width: 100%; max-width: 200px; height: auto;">
@@ -515,8 +489,8 @@ $json_data = json_encode($js_data);
                             <li class="activity-item">
                                 <span class="iconify" data-icon="<?= $aktivitas['icon'] ?>" style="font-size: 1.125rem; color: var(--color-primary);"></span>
                                 <div>
-                                    <p style="font-size: 0.875rem; font-weight: 600;">
-                                        **<?= $aktivitas['aksi'] ?>** (Kode Booking: <?= $aktivitas['kode_booking'] ?>)
+                                    <p style="font-size: 0.875rem; font-weight: 600; color: var(--color-text-light)">
+                                        **<?= $aktivitas['aksi'] ?>** (Kode Booking: <?= $aktivitas['kode_reservasi'] ?>)
                                     </p>
                                     <span style="font-size: 0.75rem; color: var(--color-text-light); display: block; margin-top: 2px;">
                                         Waktu Pengguna Aksi: <?= $aktivitas['waktu'] ?>
@@ -539,8 +513,8 @@ $json_data = json_encode($js_data);
                     <canvas id="pendapatanMingguanChart"></canvas>
                 </div>
                 <p class="catatan-pendapatan">
-                    Total Pemasukan Bulan Ini: <span style="font-weight: 600; color: var(--color-blue);">Rp <?= number_format($js_data['pemasukan'], 0, ',', '.') ?></span> 
-                    | Total Pengeluaran: <span style="font-weight: 600; color: var(--color-red);">Rp <?= number_format($js_data['pengeluaran'], 0, ',', '.') ?></span>
+                    Total Pemasukan (7 Hari): <span style="font-weight: 600; color: var(--color-blue);">Rp <?= number_format($js_data['pemasukan'], 0, ',', '.') ?></span> 
+                    | Total Pengeluaran (7 Hari): <span style="font-weight: 600; color: var(--color-red);">Rp <?= number_format($js_data['pengeluaran'], 0, ',', '.') ?></span>
                 </p>
             </div>
 
@@ -552,14 +526,17 @@ $json_data = json_encode($js_data);
         // Data PHP disuntikkan ke variabel JavaScript
         const dataDashboard = <?= $json_data ?>;
 
-        // Fungsi untuk me-render daftar aktivitas terakhir
         function renderAktivitas() {
             const ul = document.getElementById('daftar-aktivitas');
             
-            if (ul.children.length > 0) {
+            if (ul.children.length > 0 && dataDashboard.aktivitas.length > 0) {
                 const items = ul.getElementsByClassName('activity-item');
-                dataDashboard.aktivitas.forEach((item, index) => {
+                const loopLength = Math.min(dataDashboard.aktivitas.length, items.length);
+
+                for (let index = 0; index < loopLength; index++) {
+                    const item = dataDashboard.aktivitas[index];
                     const li = items[index];
+                    
                     if (li) {
                         const iconSpan = li.querySelector('.iconify');
                         const status = item.status;
@@ -575,18 +552,28 @@ $json_data = json_encode($js_data);
                             statusColor = '#3b82f6';  
                         }
 
-                        if (iconSpan) iconSpan.style.color = statusColor;
+                        if (iconSpan) {
+                            iconSpan.style.color = statusColor;
+                            iconSpan.setAttribute('data-icon', item.icon);
+                        }
+                        
                         const pElement = li.querySelector('p');
                         const timeSpan = li.querySelector('span:last-child');
+                        
                         if (pElement) {
                             const actionTextHtml = item.aksi.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                            pElement.innerHTML = actionTextHtml + ` (Kode Booking: ${item.kode_booking})`;
+                            pElement.innerHTML = actionTextHtml + ` (Kode Booking: ${item.kode_reservasi})`;
                         }
                         if (timeSpan) {
                             timeSpan.innerHTML = `Waktu Pengguna Aksi: ${item.waktu}`;
                         }
                     }
-                });
+                }
+            } else if (dataDashboard.aktivitas.length === 0) {
+                 const pElement = ul.querySelector('p');
+                 if (!pElement) {
+                     ul.innerHTML = '<p style="text-align: center; color: #9ca3af; padding: 12px;">Tidak ada aktivitas reservasi terbaru.</p>';
+                 }
             }
         }
 
@@ -606,12 +593,11 @@ $json_data = json_encode($js_data);
                 dataStatus.dibatalkan
             ];
             
-            // Warna disesuaikan dengan status
             const colors = [
-                getComputedStyle(document.documentElement).getPropertyValue('--color-primary'), // Hijau (Terkonfirmasi)
-                '#f59e0b', // Kuning (Menunggu)
-                '#3b82f6', // Biru (Selesai)
-                getComputedStyle(document.documentElement).getPropertyValue('--color-red') // Merah (Dibatalkan)
+                getComputedStyle(document.documentElement).getPropertyValue('--color-primary'),
+                '#f59e0b', 
+                '#3b82f6', 
+                getComputedStyle(document.documentElement).getPropertyValue('--color-red')
             ];
 
             new Chart(ctx, {
