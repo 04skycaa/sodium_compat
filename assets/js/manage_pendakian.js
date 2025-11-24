@@ -43,23 +43,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 <input type="number" id="id_pendaki_display" value="${data.id_pendaki ?? ''}" disabled>
 
                 <label for="nama_lengkap">Nama Lengkap:</label>
-                <input type="text" id="nama_lengkap" name="nama_lengkap" value="${data.nama_lengkap ?? ''}" required>
+                <input type="text" id="nama_lengkap" name="nama_lengkap" value="${data.nama_lengkap ?? ''}" disabled>
 
                 <label for="nik">NIK:</label>
-                <input type="text" id="nik" name="nik" value="${data.nik ?? ''}" required>
+                <input type="text" id="nik" name="nik" value="${data.nik ?? ''}" disabled>
 
                 <label for="alamat">Alamat:</label>
-                <input type="text" id="alamat" name="alamat" value="${data.alamat ?? ''}" required>
+                <input type="text" id="alamat" name="alamat" value="${data.alamat ?? ''}" disabled>
 
                 <label for="nomor_telepon">No. Telepon:</label>
-                <input type="text" id="nomor_telepon" name="nomor_telepon" value="${data.nomor_telepon ?? ''}" required>
+                <input type="text" id="nomor_telepon" name="nomor_telepon" value="${data.nomor_telepon ?? ''}" disabled>
 
                 <label for="kontak_darurat">Kontak Darurat:</label>
-                <input type="text" id="kontak_darurat" name="kontak_darurat" value="${data.kontak_darurat ?? ''}" required>
+                <input type="text" id="kontak_darurat" name="kontak_darurat" value="${data.kontak_darurat ?? ''}" disabled>
                 
                 <p style="font-size: 0.8rem; color: #999;">Catatan: Pembaruan Surat Sehat harus dilakukan terpisah.</p>
                 <div class="form-actions">
-                    <button type="submit" class="btn blue">Simpan Perubahan</button>
                     <button type="button" class="btn red" id="cancelForm">Batal</button>
                 </div>
             </form>
@@ -116,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 kontak_darurat: row.children[6].textContent,
             };
 
-            openModal('Edit Data Anggota Rombongan', buildForm(rowData));
+            openModal('Detail Data Anggota Rombongan', buildForm(rowData));
 
             document.getElementById('cancelForm').addEventListener('click', closeModal);
             

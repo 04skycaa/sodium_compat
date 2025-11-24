@@ -24,17 +24,21 @@ document.addEventListener('DOMContentLoaded', function() {
                     window.location.reload(); 
                 } else {
                     return response.text().then(text => {
+                        // Jika respons tidak sukses dan bukan redirect, anggap error
                         throw new Error(text || 'Terjadi kesalahan tidak dikenal');
                     });
                 }
             })
             .catch(error => {
+                // Tampilkan pesan kesalahan ke pengguna
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
                     text: 'Terjadi kesalahan. Cek konsol (F12) untuk detail.'
                 });
                 console.error('Error:', error);
+                
+                // Kembalikan tombol ke kondisi semula
                 submitButton.innerHTML = originalButtonText;
                 submitButton.disabled = false;
             });
@@ -52,11 +56,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const modalTitle = document.getElementById('pembukuan-modal-title');
 
     function openModal() {
-        // PERBAIKAN: Menggunakan 'show' sesuai style.css Anda
+        // Menggunakan 'show' sesuai style.css
         if (modalOverlay) modalOverlay.classList.add('show');
     }
     function closeModal() {
-        // PERBAIKAN: Menggunakan 'show' sesuai style.css Anda
+        // Menggunakan 'show' sesuai style.css
         if (modalOverlay) modalOverlay.classList.remove('show');
         if (modalBody) modalBody.innerHTML = ''; // Kosongkan isi modal
     }
@@ -84,7 +88,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Tampilkan modal DENGAN spinner
             openModal();
             if(modalBody) {
-                // Gunakan style inline untuk spinner jika belum ada di style.css
+                // Gunakan style inline untuk spinner
                 modalBody.innerHTML = '<div class="loading-spinner" style="text-align: center; padding: 40px 0; font-size: 24px; color: #007bff;"><i class="fa-solid fa-spinner fa-spin"></i></div>';
             }
 
@@ -99,13 +103,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     return response.text();
                 })
                 .then(html => {
-                    modalBody.innerHTML = html;
-                    setupModalFormSubmit();
+                    if (modalBody) modalBody.innerHTML = html;
+                    setupModalFormSubmit(); // Pasang listener form setelah HTML dimuat
                 })
                 .catch(error => {
                     console.error('Fetch error:', error);
                     Swal.fire('Error', 'Gagal memuat data untuk diedit.', 'error');
-                    modalBody.innerHTML = `<p style='color: red;'>${error.message}</p>`;
+                    if (modalBody) modalBody.innerHTML = `<p style='color: red; text-align: center;'>${error.message}</p>`;
                 });
         });
     });
@@ -132,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (response.redirected || response.type === 'opaqueredirect') {
                         window.location.reload(); // Sukses, muat ulang halaman
                     } else {
-                         return response.text().then(text => {
+                        return response.text().then(text => {
                             throw new Error(text || 'Terjadi kesalahan tidak dikenal');
                         });
                     }
@@ -156,11 +160,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const bukaKategoriModalBtn = document.getElementById('buka-modal-kategori-btn');
 
     function openModalKategori() {
-        // PERBAIKAN: Menggunakan 'show' sesuai style.css Anda
+        // Menggunakan 'show' sesuai style.css
         if (kategoriModalOverlay) kategoriModalOverlay.classList.add('show');
     }
     function closeModalKategori() {
-        // PERBAIKAN: Menggunakan 'show' sesuai style.css Anda
+        // Menggunakan 'show' sesuai style.css
         if (kategoriModalOverlay) kategoriModalOverlay.classList.remove('show');
         if (kategoriForm) kategoriForm.reset(); // Reset form saat ditutup
     }
@@ -222,7 +226,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             })
             .catch(error => {
-                Swal('Error', 'Terjadi kesalahan jaringan.', 'error');
+                // FIX YANG DITERAPKAN: Mengubah Swal(...) menjadi Swal.fire(...)
+                Swal.fire('Error', 'Terjadi kesalahan jaringan.', 'error');
                 console.error('Error:', error);
             })
             .finally(() => {
