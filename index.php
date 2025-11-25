@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-translate-key="page_title">Gunung Butak | Reservasi Pendakian</title>
+    <title data-translate-key="page_title">Gunung Butak </title>
     <link rel="icon" type="image/x-icon" href="assets/images/LOGO_WEB.png">
     
     <!-- Google Fonts -->
@@ -27,7 +27,7 @@
                 <div class="flex-display items-center justify-between">
                     <div class="flex-display items-center">
                         <img src="assets/images/LOGO_WEB.png" alt="Logo Gunung Butak" class="w-10 h-10 mr-3">
-                        <h1 class="text-xl font-bold" data-translate-key="header_title">Gunung Butak | Reservasi Pendakian</h1>
+                        <h1 class="text-xl font-bold" data-translate-key="header_title">Gunung Butak</h1>
                     </div>
                     <div class="flex-display items-center space-x-4">
                         <!-- Tombol Toggle Bahasa -->
@@ -39,9 +39,10 @@
                             <i class="fas fa-moon" id="theme-icon"></i>
                         </button>
                         <div id="auth-container">
-                            <a href="/simaksi/auth/login.php" id="auth-link" class="border border-white px-4 py-2 rounded-full text-sm hover-bg-white text-white transition-default" data-translate-key="login_button">
+                            <a href="/simaksi/auth/login.php" class="login-button">
                                 Login
                             </a>
+                        </div>
                             <a href="#" id="logout-link" class="border border-white px-4 py-2 rounded-full text-sm hover-bg-white text-white transition-default hidden" data-translate-key="logout_button">
                                 Logout
                             </a>
@@ -68,12 +69,12 @@
                 </p>
             </div>
             
-            <div class="flex-display flex-col sm-flex-row justify-center space-y-6 sm-space-y-0 sm-space-x-8 hero-content mb-16">
-                <a href="#" class="pulse-button bg-gradient-accent-primary text-white font-bold py-4 px-10 rounded-full transition-default hover-scale-105 shadow-2xl text-lg glow-button" data-translate-key="reserve_now">
-                    <i class="fas fa-rocket mr-3"></i>Reservasi Sekarang
+            <div class="button-container">
+                <a href="#" class="pulse-button button-reserve">
+                    <i class="fas fa-rocket"></i>Reservasi Sekarang
                 </a>
-                <a href="#lokasi" class="pulse-button border-2 border-white text-white hover-bg-white font-bold py-4 px-10 rounded-full transition-default hover-scale-105 shadow-2xl text-lg glow-button" data-translate-key="location">
-                    <i class="fas fa-map-marker-alt mr-3"></i>Lokasi Pendakian
+                <a href="#lokasi" class="pulse-button button-location">
+                    <i class="fas fa-map-marker-alt"></i>Lokasi Pendakian
                 </a>
             </div>
             
@@ -357,17 +358,13 @@
                         <img src="assets/images/gunung2.jpg" alt="Sabana Luas" class="w-full h-full object-cover transition-transform group-hover:scale-110">
                         <div class="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 opacity-0 group-hover:opacity-20 transition-default"></div>
                     </div>
-                    
                     <div class="p-8">
-                        
-                        <div class="w-16 h-16 bg-gradient-to-r from-blue-100 to-blue-200 rounded-full flex-display items-center justify-center mb-6 text-blue-600 auto-margin">
+                        <div class="w-16 h-16 bg-green-600 rounded-full flex-display items-center justify-center mb-6 text-white auto-margin">
                             <i class="fas fa-camera text-2xl"></i>
                         </div>
-                        
-                        <h3 class="text-3xl font-bold mb-4 text-center text-primary" data-translate-key="vast_savanna_title">Pemandangan Indah</h3>
-                        
-                        <p class="text-gray-700 text-lg leading-relaxed text-center" data-translate-key="vast_savanna_desc">
-                           Nikmati pemandangan alam yang luar biasa dari hutan hingga sabana yang menakjubkan di sepanjang jalur pendakian. 
+                        <h3 class="text-3xl font-bold mb-4 text-center text-primary" data-translate-key="scenic_view_title">Pemandangan Indah</h3>
+                        <p class="text-gray-700 text-lg leading-relaxed text-center" data-translate-key="scenic_view_desc">
+                            Nikmati pemandangan alam yang luar biasa dari hutan hingga sabana yang menakjubkan di sepanjang jalur pendakian. 
                             Puncak Gunung Butak menawarkan pemandangan 360 derajat yang memukau.
                         </p>
                     </div>
@@ -444,97 +441,106 @@
                 </p>
             </div>
             
-            <div class="time-card-grid gap-12 max-w-6xl auto-margin">
-                <!-- Card 1 -->
-                <div class="feature-badge bg-gradient-br-orange-yellow rounded-3xl shadow-2xl p-10 card-hover border-t-4 border-orange-400 overflow-hidden">
-                    <div class="text-center mb-8">
-                        <div class="w-24 h-24 bg-gradient-to-r from-orange-100 to-yellow-100 rounded-full flex-display items-center justify-center auto-margin mb-6 text-orange-600">
-                            <i class="fas fa-cloud-sun text-4xl"></i>
-                        </div>
-                        <h3 class="text-3xl font-bold mb-2 text-orange" data-translate-key="dry_season_title">Musim Kemarau</h3>
-                        <p class="text-lg text-gray-600" data-translate-key="dry_season_months">April - Oktober</p>
-                    </div>
-                    <ul class="space-y-5">
-                        <li class="flex-display items-start group">
-                            <div class="w-10 h-10 bg-green-100 rounded-full flex-display items-center justify-center mt-1 mr-4 flex-shrink-0 group-hover:bg-green-200 transition-colors">
-                                <i class="fas fa-check text-green-600"></i>
-                            </div>
-                            <div>
-                                <p class="text-gray-800 font-medium text-lg" data-translate-key="dry_season_benefit_1"><strong>Jalur pendakian stabil</strong> tanpa hambatan genangan air</p>
-                            </div>
-                        </li>
-                        <li class="flex-display items-start group">
-                            <div class="w-10 h-10 bg-green-100 rounded-full flex-display items-center justify-center mt-1 mr-4 flex-shrink-0 group-hover:bg-green-200 transition-colors">
-                                <i class="fas fa-check text-green-600"></i>
-                            </div>
-                            <div>
-                                <p class="text-gray-800 font-medium text-lg" data-translate-key="dry_season_benefit_2"><strong>Visibilitas sangat baik</strong> untuk menikmati pemandangan</p>
-                            </div>
-                        </li>
-                        <li class="flex-display items-start group">
-                            <div class="w-10 h-10 bg-green-100 rounded-full flex-display items-center justify-center mt-1 mr-4 flex-shrink-0 group-hover:bg-green-200 transition-colors">
-                                <i class="fas fa-check text-green-600"></i>
-                            </div>
-                            <div>
-                                <p class="text-gray-800 font-medium text-lg" data-translate-key="dry_season_benefit_3"><strong>Suhu sejuk dan nyaman</strong> untuk pendakian</p>
-                            </div>
-                        </li>
-                        <li class="flex-display items-start group">
-                            <div class="w-10 h-10 bg-green-100 rounded-full flex-display items-center justify-center mt-1 mr-4 flex-shrink-0 group-hover:bg-green-200 transition-colors">
-                                <i class="fas fa-check text-green-600"></i>
-                            </div>
-                            <div>
-                                <p class="text-gray-800 font-medium text-lg" data-translate-key="dry_season_benefit_4"><strong>Kondisi jalan kering</strong> memudahkan perjalanan</p>
-                            </div>
-                        </li>
-                    </ul>
+            <div class="time-card-grid">
+        
+        <!-- Card 1: Musim Kemarau -->
+        <div class="time-card season-card">
+            <div class="card-header text-center">
+                <div class="main-icon-container">
+                    <i class="fas fa-cloud-sun"></i>
                 </div>
-                
-                <!-- Card 2 -->
-                <div class="feature-badge bg-gradient-br-blue-indigo rounded-3xl shadow-2xl p-10 card-hover border-t-4 border-blue-600 overflow-hidden">
-                    <div class="text-center mb-8">
-                        <div class="w-24 h-24 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-full flex-display items-center justify-center auto-margin mb-6 text-blue-600">
-                            <i class="fas fa-clock text-4xl"></i>
-                        </div>
-                        <h3 class="text-3xl font-bold mb-2 text-blue-600" data-translate-key="ideal_daily_time_title">Waktu Ideal Sehari</h3>
-                        <p class="text-lg text-gray-600" data-translate-key="daily_climb_label">Pendakian Harian</p>
-                    </div>
-                    <ul class="space-y-5">
-                        <li class="flex-display items-start group">
-                            <div class="w-10 h-10 bg-yellow-100 rounded-full flex-display items-center justify-center mt-1 mr-4 flex-shrink-0 group-hover:bg-yellow-200 transition-colors">
-                                <i class="fas fa-sun text-yellow-600"></i>
-                            </div>
-                            <div>
-                                <p class="text-gray-800 font-medium text-lg" data-translate-key="daily_time_1"><strong>Pagi hari (04:00-06:00):</strong> Udara segar dan suhu nyaman</p>
-                            </div>
-                        </li>
-                        <li class="flex-display items-start group">
-                            <div class="w-10 h-10 bg-orange-100 rounded-full flex-display items-center justify-center mt-1 mr-4 flex-shrink-0 group-hover:bg-orange-200 transition-colors">
-                                <i class="fas fa-sunrise text-orange-600"></i>
-                            </div>
-                            <div>
-                                <p class="text-gray-800 font-medium text-lg" data-translate-key="daily_time_2"><strong>Matahari terbit:</strong> Pemandangan menakjubkan dari puncak</p>
-                            </div>
-                        </li>
-                        <li class="flex-display items-start group">
-                            <div class="w-10 h-10 bg-red-100 rounded-full flex-display items-center justify-center mt-1 mr-4 flex-shrink-0 group-hover:bg-red-200 transition-colors">
-                                <i class="fas fa-sun text-red-600"></i>
-                            </div>
-                            <div>
-                                <p class="text-gray-800 font-medium text-lg" data-translate-key="daily_time_3"><strong>Hindari siang (10:00-15:00):</strong> Suhu panas yang melelahkan</p>
-                            </div>
-                        </li>
-                        <li class="flex-display items-start group">
-                            <div class="w-10 h-10 bg-indigo-100 rounded-full flex-display items-center justify-center mt-1 mr-4 flex-shrink-0 group-hover:bg-indigo-200 transition-colors">
-                                <i class="fas fa-moon text-indigo-600"></i>
-                            </div>
-                            <div>
-                                <p class="text-gray-800 font-medium text-lg" data-translate-key="daily_time_4"><strong>Malam hari:</strong> Sempurna untuk stargazing</p>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
+                <h3>Musim Kemarau</h3>
+                <p>April - Oktober</p>
             </div>
+            <ul class="card-list">
+                <!-- Item 1 -->
+                <li class="card-list-item">
+                    <div class="list-icon-wrapper checkmark-circle">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div>
+                        <p><strong>Jalur pendakian stabil</strong> tanpa hambatan genangan air</p>
+                    </div>
+                </li>
+                <!-- Item 2 -->
+                <li class="card-list-item">
+                    <div class="list-icon-wrapper checkmark-circle">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div>
+                        <p><strong>Visibilitas sangat baik</strong> untuk menikmati pemandangan</p>
+                    </div>
+                </li>
+                <!-- Item 3 -->
+                <li class="card-list-item">
+                    <div class="list-icon-wrapper checkmark-circle">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div>
+                        <p><strong>Suhu sejuk dan nyaman</strong> untuk pendakian</p>
+                    </div>
+                </li>
+                <!-- Item 4 -->
+                <li class="card-list-item">
+                    <div class="list-icon-wrapper checkmark-circle">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div>
+                        <p><strong>Kondisi jalan kering</strong> memudahkan perjalanan</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- Card 2: Waktu Ideal Sehari -->
+        <div class="time-card daily-time-card">
+            <div class="card-header text-center">
+                <div class="main-icon-container">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h3>Waktu Ideal Sehari</h3>
+                <p>Pendakian Harian</p>
+            </div>
+            <ul class="card-list">
+                <!-- Item 1 (Pagi Hari - Yellow) - Menggunakan fa-cloud-sun -->
+                <li class="card-list-item">
+                    <div class="list-icon-wrapper time-icon yellow">
+                        <i class="fas fa-cloud-sun"></i> 
+                    </div>
+                    <div>
+                        <p><strong>Pagi hari (04:00-06:00):</strong> Udara segar dan suhu nyaman</p>
+                    </div>
+                </li>
+                <!-- Item 2 (Matahari Terbit - Orange) - Menggunakan fa-sun -->
+                <li class="card-list-item">
+                    <div class="list-icon-wrapper time-icon orange">
+                        <i class="fas fa-sun"></i>
+                    </div>
+                    <div>
+                        <p><strong>Matahari terbit:</strong> Pemandangan menakjubkan dari puncak</p>
+                    </div>
+                </li>
+                <!-- Item 3 (Hindari Siang - Red) -->
+                <li class="card-list-item">
+                    <div class="list-icon-wrapper time-icon red">
+                        <i class="fas fa-sun"></i>
+                    </div>
+                    <div>
+                        <p><strong>Hindari siang (10:00-15:00):</strong> Suhu panas yang melelahkan</p>
+                    </div>
+                </li>
+                <!-- Item 4 (Malam Hari - Indigo) -->
+                <li class="card-list-item">
+                    <div class="list-icon-wrapper time-icon indigo">
+                        <i class="fas fa-moon"></i>
+                    </div>
+                    <div>
+                        <p><strong>Malam hari:</strong> Sempurna untuk stargazing</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
             
             <!-- Weather Forecast Section -->
             <div class="weather-container">
@@ -776,23 +782,22 @@
             </div>
             
             <!-- Stats Section -->
-            <div class="bg-gradient-primary-accent rounded-3xl p-12 text-white mt-16">
-                <div class="grid-cols-1 md-grid-cols-3 gap-8">
-                    <div class="text-center feature-badge card-hover">
-                        <div class="text-7xl font-bold mb-4" id="total-pendaki-rating">98%</div>
-                        <p class="text-xl opacity-90" data-translate-key="climber_satisfaction">Kepuasan Pendaki</p>
-                    </div>
-                    <div class="text-center feature-badge card-hover">
-                        <div class="text-7xl font-bold mb-4" id="avg-rating">4.9/5</div>
-                        <p class="text-xl opacity-90" data-translate-key="avg_rating_label">Rating Rata-rata</p>
-                    </div>
-                    <div class="text-center feature-badge card-hover">
-                        <div class="text-7xl font-bold mb-4" id="total-komentar">5000+</div>
-                        <p class="text-xl opacity-90" data-translate-key="total_reviews">Total Ulasan</p>
-                    </div>
+            <div class="stats-container">
+                <div class="stats-grid">                    
+                    <div class="stat-item">
+                        <div class="stat-value" id="total-pendaki-rating">98%</div>
+                        <p class="stat-label" data-translate-key="climber_satisfaction">Kepuasan Pendaki</p>
+                    </div>                   
+                    <div class="stat-item">
+                        <div class="stat-value" id="avg-rating">4.9/5</div>
+                        <p class="stat-label" data-translate-key="avg_rating_label">Rating Rata-rata</p>
+                    </div>                   
+                    <div class="stat-item">
+                        <div class="stat-value" id="total-komentar">5000+</div>
+                        <p class="stat-label" data-translate-key="total_reviews">Total Ulasan</p>
+                    </div>                   
                 </div>
-            </div>
-            
+            </div>           
         </div>
     </section>
 

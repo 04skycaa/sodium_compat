@@ -351,6 +351,87 @@ body {
     z-index: 20; 
 }
 
+.button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 4rem;
+    flex-direction: column;
+}
+
+@media (min-width: 600px) {
+.button-container {
+    flex-direction: row; 
+    gap: 2rem;
+}
+}
+
+.pulse-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 2.5rem;
+    border-radius: 9999px; 
+    font-size: 1.125rem;
+    font-weight: bold;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    width: 100%;
+    max-width: 350px;
+}
+
+.button-reserve {
+    background-color: #75B368;
+    color: #ffffff;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 0 15px rgba(40, 167, 69, 0.5); 
+    animation: pulse 2s infinite; 
+    }
+
+.button-reserve:hover {
+    background-color: #75B368;
+    transform: scale(1.05);
+    box-shadow: 0 15px 20px -5px rgba(0, 0, 0, 0.4), 0 0 25px #35542E;
+}
+
+.button-location {
+    background-color: transparent;
+    border: 2px solid #75B368; 
+    color: #ffffff;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+}
+
+.button-location:hover {
+    background-color: #75B368; 
+    color: #ffffff; 
+    transform: scale(1.05);
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.5); }
+    70% { box-shadow: 0 0 0 15px rgba(40, 167, 69, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+}
+
+.pulse-button i { margin-right: 0.75rem; font-size: 1.25em; }
+
+.login-button {
+    font-size: 0.875rem; 
+    padding: 0.5rem 1rem; 
+    font-weight: 600;
+    text-decoration: none; 
+    border: 1px solid #ffffff; 
+    border-radius: 9999px;
+    color: #ffffff; 
+    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out, transform 0.15s ease-out;
+}
+
+.login-button:hover {
+    background-color: #ffffff;
+    color: #333; 
+    transform: translateY(-1px); 
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
 
 /* Perbaikan untuk Hero Content agar tetap di tengah */
 .hero-content {
@@ -747,7 +828,9 @@ body {
     overflow: hidden;
     transition: all 0.3s ease-in-out;
     position: relative;
-    background: linear-gradient(to bottom right, #50C878, #35542E); 
+    background: none !important;
+    background-color: #75B368 !important; 
+    border: none !important; 
 }
 
 .feature-card.card-hover:hover {
@@ -847,85 +930,201 @@ body {
 
 /* untuk waktu mendaki */
 
-.time-card-grid { 
+.time-card-grid {
     display: flex;
     justify-content: center;
     align-items: stretch;
-    flex-wrap: wrap; 
-    gap: 3rem; 
+    flex-wrap: wrap;
+    gap: 3rem;
     max-width: 72rem;
     margin: 0 auto;
 }
 
-.time-card-grid > .feature-badge {
+.time-card {
     flex: 1 1 350px;
-    max-width: 50%; 
     min-width: 300px;
-    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    max-width: 48%;
+    border-radius: 1.5rem;
+    padding: 2.5rem;
+    overflow: hidden;
+    background: linear-gradient(to bottom, #497241 0%, #1f331b 100%);
+    border-top: 4px solid #75B368;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    cursor: default;
 }
 
-.py-20 .title-best-time { 
-    color: #35542E !important; 
-}
-
-.py-20 p.text-gray-600 { 
-    color: #4b5563 !important; 
+.time-card:hover {
+    transform: translateY(-5px) scale(1.01);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
 }
 
 @media (max-width: 768px) {
-    .time-card-grid > .feature-badge {
-        flex-basis: 100%; 
+    .time-card {
+        flex-basis: 100%;
         max-width: 100%;
     }
 }
 
-/* mode light */
-.time-card-grid > .feature-badge {
-    background: #75B368 !important; 
-    border-top-color: #35542E !important; 
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+.card-header {
+    margin-bottom: 2rem;
 }
 
-.time-card-grid .feature-badge h3, 
-.time-card-grid .feature-badge p,
-.time-card-grid .feature-badge li,
-.time-card-grid .feature-badge strong {
-    color: #f3f4f6 !important; 
+.main-icon-container {
+    width: 6rem;
+    height: 6rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem auto;
+    background: #75B368;
+    color: #f3f4f6;
 }
 
-.time-card-grid .w-24.h-24 {
-    background: #35542E !important; 
-    color: #f3f4f6 !important; 
+.main-icon-container i {
+    font-size: 2.25rem;
 }
 
-.time-card-grid .fa-check.text-green-600 {
-    color: #f8c330 !important;
+.card-header h3 {
+    font-size: 1.875rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: #f3f4f6;
 }
 
-.time-card-grid .w-10.h-10.bg-green-100 {
-    background-color: #35542E !important;
+.card-header p {
+    font-size: 1.125rem;
+    color: #f3f4f6;
+    opacity: 0.8;
 }
 
-
-/* mode dark */
-.dark-mode .py-20 .title-best-time,
-.dark-mode .py-20 p.text-gray-600 {
-    color: #f3f4f6 !important; 
+.card-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
-.dark-mode .time-card-grid > .feature-badge {
-    background: #35542E !important; 
-    border-top-color: #75B368 !important;
+.card-list-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.25rem;
+}
+
+.list-icon-wrapper {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0;
+    margin-right: 1rem;
+    flex-shrink: 0;
+    transition: background-color 0.3s ease;
+}
+
+.card-list-item > div:last-child p {
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: #f3f4f6;
+}
+
+.card-list-item > div:last-child strong {
+    font-weight: 700;
+}
+
+.checkmark-circle {
+    background-color: #75B368;
+}
+
+.checkmark-circle i {
+    color: #f8c330;
+}
+.time-icon.yellow {
+    background-color: #fef08a;
+}
+.time-icon.yellow i {
+    color: #1f2937;
+}
+
+.time-icon.orange {
+    background-color: #ffe6b8;
+}
+.time-icon.orange i {
+    color: #1f2937;
+}
+
+.time-icon.red {
+    background-color: #fee2e2;
+}
+.time-icon.red i {
+    color: #dc2626;
+}
+
+.time-icon.indigo {
+    background-color: #e0e7ff;
+}
+.time-icon.indigo i {
+    color: #4f46e5;
+}
+
+.time-icon-wrapper i {
+    font-size: 1rem;
+}
+
+.dark-mode-toggle {
+    background-color: #75B368;
+    color: #35542E;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s, transform 0.2s;
+}
+.dark-mode-toggle:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.25);
+}
+
+/* dark mode */
+
+.dark-mode body {
+    background-color: #1f2937;
+}
+
+.dark-mode .time-card {
+    background: linear-gradient(to bottom, #75B368 0%, #9BC45F 100%);
+    border-top: 4px solid #35542E;
     box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
 }
 
-.dark-mode .time-card-grid .w-24.h-24 {
-    background: #75B368 !important;
-    color: #f3f4f6 !important; 
+.dark-mode .time-card:hover {
+    box-shadow: 0 20px 40px rgba(255, 255, 255, 0.1);
 }
 
-.dark-mode .time-card-grid .w-10.h-10.bg-green-100 {
-    background-color: #75B368 !important;
+.dark-mode .main-icon-container {
+    background: #35542E;
+    color: #f3f4f6;
+}
+
+.dark-mode .checkmark-circle {
+     background-color: #35542E;
+}
+.dark-mode .checkmark-circle i {
+    color: #f8c330;
+}
+
+.dark-mode .list-icon-wrapper.time-icon {
+    background-color: #35542E;
+}
+
+.dark-mode .time-icon.yellow i,
+.dark-mode .time-icon.red i,
+.dark-mode .time-icon.indigo i,
+.dark-mode .time-icon.orange i {
+    color: #f3f4f6;
 }
 
 /* untuk tampilan cuaca */
@@ -1935,4 +2134,84 @@ footer ul li i {
 
 #scroll-to-top-btn i.fa-arrow-up {
     font-size: 1.2rem;
+}
+
+// untuk bagian bawah kepuasan user
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.stats-container {
+    /* Warna Gradient: #35542E dan #75B368 */
+    background: linear-gradient(135deg, #35542E, #75B368);
+    border-radius: 1.5rem; /* Sudut membulat */
+    padding: 3rem; 
+    color: white;
+    width: 100%;
+    max-width: 1280px; /* Batas lebar maksimal yang ditingkatkan */
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    
+    /* Animasi Fade In saat dimuat */
+    opacity: 0;
+    animation: fadeIn 1s ease-out forwards;
+}
+
+/* Grid Layout */
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr; /* Default 1 kolom untuk mobile */
+    gap: 2rem; 
+}
+
+/* Stat Item */
+.stat-item {
+    text-align: center;
+    padding: 1.5rem;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+    cursor: pointer;
+    border-radius: 1rem;
+}
+
+/* Efek Hover */
+.stat-item:hover {
+    transform: translateY(-8px) scale(1.03);
+    background-color: rgba(255, 255, 255, 0.15); 
+}
+
+/* Nilai Statistik */
+.stat-value {
+    font-size: 4.5rem; 
+    font-weight: 900; 
+    margin-bottom: 1rem; 
+    line-height: 1;
+    transition: color 0.3s ease;
+}
+
+.stat-item:hover .stat-value {
+     animation: pulse 0.8s ease-in-out infinite;
+     color: #ffdd57; 
+}
+
+.stat-label {
+    font-size: 1.25rem; 
+    opacity: 0.9;
+    font-weight: 400;
+    margin-top: 0;
+}
+
+@media (min-width: 768px) {
+    .stats-grid {
+        grid-template-columns: repeat(3, 1fr); 
+    }
+    .stats-container {
+        padding: 4rem;
+    }
 }

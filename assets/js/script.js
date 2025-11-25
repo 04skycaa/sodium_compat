@@ -1,26 +1,19 @@
-// ===========================================
-// KODE UNTUK SIDEBAR HOVER-TO-OPEN & FUNGSIONALITAS UMUM
-// ===========================================
-
 let navigation = document.querySelector(".navigation");
 let main = document.querySelector(".main");
 let toggle = document.querySelector(".toggle");
 let hoverArea = navigation;
-
-// Matikan fungsi toggle.onclick yang lama
 if (toggle) {
   toggle.onclick = function (e) {
     e.preventDefault(); 
-    // Manual override: Klik akan membalikkan status
     navigation.classList.toggle("active");
     main.classList.toggle("active");
   };
 }
 
-// LOGIKA HOVER-TO-OPEN SIDEBAR (Otomatis Buka/Tutup)
+// fungsi hover untuk membuka sidebar saat mouse berada di area sidebar
 if (hoverArea) {
   let closeTimeout;
-  const hoverDelay = 100; // Jeda 100ms untuk menutup
+  const hoverDelay = 100; 
 
   hoverArea.addEventListener("mouseenter", function () {
     clearTimeout(closeTimeout); 
@@ -34,30 +27,27 @@ if (hoverArea) {
   hoverArea.addEventListener("mouseleave", function () {
     // Tetapkan timeout untuk menutup setelah jeda singkat
     closeTimeout = setTimeout(() => {
-        // Tutup sidebar
         navigation.classList.add("active");
         main.classList.add("active");
     }, hoverDelay); 
   });
 }
 
-
-// FUNGSI UNTUK MENAMPILKAN JAM DAN TANGGAL
-// FUNGSI UNTUK MENAMPILKAN JAM, TANGGAL, DAN UCAPAN SELAMAT
+// untuk menampilkan tanggal dan waktu serta sapaan berdasarkan waktu
 function updateDateTime() {
     const now = new Date();
-    const hour = now.getHours(); // Mengambil jam (0-23)
+    const hour = now.getHours(); 
 
-    let greeting = 'Selamat Malam'; // Default malam (21:00 - 04:59)
+    let greeting = 'Selamat Malam';
 
     if (hour >= 5 && hour < 11) {
-        greeting = 'Selamat Pagi'; // Pagi (05:00 - 10:59)
+        greeting = 'Selamat Pagi'; 
     } else if (hour >= 11 && hour < 15) {
-        greeting = 'Selamat Siang'; // Siang (11:00 - 14:59)
+        greeting = 'Selamat Siang'; 
     } else if (hour >= 15 && hour < 18) {
-        greeting = 'Selamat Sore'; // Sore (15:00 - 17:59)
+        greeting = 'Selamat Sore'; 
     } else if (hour >= 18 && hour < 21) {
-        greeting = 'Selamat Petang'; // Petang (18:00 - 20:59)
+        greeting = 'Selamat Malam'; 
     }
 
     // Update elemen sapaan di HTML
@@ -66,16 +56,9 @@ function updateDateTime() {
         greetingElement.textContent = greeting;
     }
     
-
-    // --- Kode untuk Jam dan Tanggal (tetap sama) ---
-
-    // Jam (HH:MM:SS)
     const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
-    // Mengganti titik dengan titik dua, sesuai format standar Indonesia (HH:MM:SS)
     const currentTime = now.toLocaleTimeString('id-ID', timeOptions); 
     document.getElementById('current-time').textContent = currentTime.replace(/\./g, ':');
-
-    // Tanggal (Hari, dd Bulan yyyy)
     const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     const currentDate = now.toLocaleDateString('id-ID', dateOptions);
     document.getElementById('current-date').textContent = currentDate;

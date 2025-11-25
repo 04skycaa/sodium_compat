@@ -116,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="container">
         <div class="left-section">
             <h1>SELAMAT DATANG DI <br> GUNUNG BUTAK</h1>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestiae eum optio debitis fugiat ad, suscipit tenetur totam labore possimus beatae itaque accusantium soluta libero quos recusandae obcaecati voluptatum temporibus enim?</p>
+            <p>Selamat datang di halaman informasi Gunung Butak. Semua yang kamu butuhkan untuk mengenal gunung ini tersedia di sini seperti panduan jalur, lokasi gunung, cuaca, serta informasi penting lainnya. Silakan login untuk membuka detail lengkap yang dapat membantu perjalananmu menjadi lebih aman, terarah, dan penuh pengalaman.</p>
         </div>
 
         <div class="right-section">
