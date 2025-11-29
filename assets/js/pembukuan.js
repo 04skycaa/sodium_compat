@@ -1,70 +1,18 @@
-// Tunggu hingga seluruh dokumen HTML selesai dimuat
 document.addEventListener('DOMContentLoaded', function() {
-    
-    // --- LOGIKA FORM TAMBAH PENGELUARAN (AJAX) ---
-    const tambahForm = document.getElementById('tambahPengeluaranForm');
-    if (tambahForm) {
-        tambahForm.addEventListener('submit', function(e) {
-            e.preventDefault(); // Mencegah reload halaman
-            const formData = new FormData(this);
-            const actionUrl = this.getAttribute('action');
-            const submitButton = this.querySelector('button[type="submit"]');
-            const originalButtonText = submitButton.innerHTML;
-
-            // Tampilkan loading di tombol
-            submitButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
-            submitButton.disabled = true;
-
-            fetch(actionUrl, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => {
-                if (response.redirected || response.type === 'opaqueredirect') {
-                    window.location.reload(); 
-                } else {
-                    return response.text().then(text => {
-                        // Jika respons tidak sukses dan bukan redirect, anggap error
-                        throw new Error(text || 'Terjadi kesalahan tidak dikenal');
-                    });
-                }
-            })
-            .catch(error => {
-                // Tampilkan pesan kesalahan ke pengguna
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'Terjadi kesalahan. Cek konsol (F12) untuk detail.'
-                });
-                console.error('Error:', error);
-                
-                // Kembalikan tombol ke kondisi semula
-                submitButton.innerHTML = originalButtonText;
-                submitButton.disabled = false;
-            });
-        });
-    }
-
-
-    // ===========================================
-    // --- LOGIKA MODAL EDIT PENGELUARAN ---
-    // ===========================================
-    
+     
     const modalOverlay = document.getElementById('pembukuan-modal-overlay');
     const modalBody = document.getElementById('pembukuan-modal-body');
     const modalCloseBtn = document.getElementById('pembukuan-modal-close');
     const modalTitle = document.getElementById('pembukuan-modal-title');
 
     function openModal() {
-        // Menggunakan 'show' sesuai style.css
         if (modalOverlay) modalOverlay.classList.add('show');
     }
     function closeModal() {
-        // Menggunakan 'show' sesuai style.css
         if (modalOverlay) modalOverlay.classList.remove('show');
-        if (modalBody) modalBody.innerHTML = ''; // Kosongkan isi modal
+        if (modalBody) modalBody.innerHTML = '';  
     }
-
+     
     if (modalCloseBtn) {
         modalCloseBtn.addEventListener('click', closeModal);
     }
@@ -75,7 +23,91 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+    const tambahForm = document.getElementById('tambahPengeluaranForm');
+    if (tambahForm) {
+        tambahForm.addEventListener('submit', function(e) {
+            e.preventDefault();  
+            
+            const submitButton = this.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.innerHTML;
+            submitButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
+            submitButton.disabled = true;
 
+            const formData = new FormData(this);
+            const actionUrl = this.getAttribute('action'); 
+            let responseText = ''; 
+            
+            fetch(actionUrl, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => { 
+                const clonedResponse = response.clone();
+                 
+                clonedResponse.text().then(text => {
+                    responseText = text;
+                    console.error('RESPONS SERVER MENTAH (Untuk Debugging JSON Error):', responseText);
+                }).catch(err => {
+                    console.error('Gagal membaca respons sebagai teks:', err);
+                });
+
+                return response.json(); 
+            })
+            .then(data => {
+                if (data.status === 'success') { 
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: data.message,  
+                        showConfirmButton: false,
+                        timer: 2000,
+                        showClass: { popup: 'animate__animated animate__fadeIn' },
+                        hideClass: { popup: 'animate__animated animate__fadeOut' }
+                    }).then(() => {
+                        window.location.reload();  
+                    });
+                } else { 
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal!',
+                        text: data.message || 'Gagal menyimpan data pengeluaran.',
+                        showClass: { popup: 'animate__animated animate__shakeX' },
+                        hideClass: { popup: 'animate__animated animate__fadeOut' }
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error Submit Tambah Pengeluaran:', error);
+                
+                let errorMessage = 'Terjadi kesalahan saat memproses permintaan.';
+                 
+                if (error.name === 'SyntaxError') {
+                    errorMessage = 'Respon server tidak valid (Bukan JSON). Silakan cek konsol browser (F12 -> Tab Console) untuk melihat respons server mentah dari proses_pembukuan.php.';
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'JSON Tidak Valid!',
+                        html: errorMessage,
+                        showClass: { popup: 'animate__animated animate__shakeX' },
+                        hideClass: { popup: 'animate__animated animate__fadeOut' }
+                    });
+                    return;  
+                }
+                 
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal Menyimpan!',
+                    text: errorMessage,
+                    showClass: { popup: 'animate__animated animate__shakeX' },
+                    hideClass: { popup: 'animate__animated animate__fadeOut' }
+                });
+            })
+            .finally(() => { 
+                submitButton.innerHTML = originalButtonText;
+                submitButton.disabled = false;
+            });
+        });
+    }
+ 
     const allEditButtons = document.querySelectorAll('.btn-edit');
     allEditButtons.forEach(button => {
         button.addEventListener('click', function() {
@@ -84,16 +116,13 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!id) return;
 
             if (modalTitle) modalTitle.textContent = 'Edit Pengeluaran';
-
-            // Tampilkan modal DENGAN spinner
+  
             openModal();
-            if(modalBody) {
-                // Gunakan style inline untuk spinner
-                modalBody.innerHTML = '<div class="loading-spinner" style="text-align: center; padding: 40px 0; font-size: 24px; color: #007bff;"><i class="fa-solid fa-spinner fa-spin"></i></div>';
+            if(modalBody) { 
+                modalBody.innerHTML = '<div class="loading-spinner" style="text-align: center; padding: 40px 0; font-size: 24px; color: #007bff;"><i class="fa-solid fa-spinner fa-spin"></i> Memuat Data...</div>';
             }
-
-            // Ambil HTML form dari get_pembukuan.php
-            const fetchUrl = `pembukuan/get_pembukuan.php?id=${id}`;
+ 
+            const fetchUrl = `pembukuan/form_edit_pengeluaran.php?id=${id}`;
 
             fetch(fetchUrl)
                 .then(response => {
@@ -104,67 +133,128 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
                 .then(html => {
                     if (modalBody) modalBody.innerHTML = html;
-                    setupModalFormSubmit(); // Pasang listener form setelah HTML dimuat
+                    setupModalFormSubmit(); 
                 })
                 .catch(error => {
-                    console.error('Fetch error:', error);
-                    Swal.fire('Error', 'Gagal memuat data untuk diedit.', 'error');
-                    if (modalBody) modalBody.innerHTML = `<p style='color: red; text-align: center;'>${error.message}</p>`;
+                    console.error('Fetch error:', error); 
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error Memuat Data',
+                        text: 'Gagal memuat data untuk diedit.',
+                        showClass: { popup: 'animate__animated animate__shakeX' },  
+                        hideClass: { popup: 'animate__animated animate__fadeOut' }
+                    }); 
+                    if (modalBody) modalBody.innerHTML = `<p style='color: red; text-align: center; padding: 20px;'>${error.message}</p>`;
                 });
         });
     });
-
-    // Fungsi ini mencari form di dalam modal edit dan memasang listener submit
-    function setupModalFormSubmit() {
-        const modalForm = document.getElementById('pengeluaranForm'); 
-        if (modalForm) {
+ 
+    function setupModalFormSubmit() { 
+        const modalForm = document.getElementById('editPengeluaranForm'); 
+        if (modalForm) { 
             modalForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                const formData = new FormData(this);
-                const actionUrl = this.getAttribute('action'); // -> "pembukuan/proses_pembukuan.php"
+                e.preventDefault(); 
+                
                 const submitButton = this.querySelector('button[type="submit"]');
                 const originalButtonText = submitButton.innerHTML;
-
                 submitButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
-                submitButton.disabled = true;
-
+                submitButton.disabled = true; 
+                const formData = new FormData(this);
+                const actionUrl = this.getAttribute('action'); 
+ 
                 fetch(actionUrl, {
                     method: 'POST',
                     body: formData
                 })
-                .then(response => {
-                    if (response.redirected || response.type === 'opaqueredirect') {
-                        window.location.reload(); // Sukses, muat ulang halaman
-                    } else {
-                        return response.text().then(text => {
-                            throw new Error(text || 'Terjadi kesalahan tidak dikenal');
+                .then(response => response.json()) 
+                .then(data => {
+                    if (data.status === 'success') {
+                        closeModal(); 
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: data.message, 
+                            showConfirmButton: false,
+                            timer: 2000,
+                            showClass: { popup: 'animate__animated animate__fadeIn' },  
+                            hideClass: { popup: 'animate__animated animate__fadeOut' }
+                        }).then(() => {
+                            window.location.reload(); 
+                        });
+                    } else { 
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal!',
+                            text: data.message || 'Gagal menyimpan data pengeluaran.',
+                            showClass: { popup: 'animate__animated animate__shakeX' },
+                            hideClass: { popup: 'animate__animated animate__fadeOut' }
                         });
                     }
                 })
                 .catch(error => {
-                    Swal.fire('Error', 'Terjadi kesalahan jaringan.', 'error');
-                    console.error('Error:', error);
+                    console.error('Error Submit Edit:', error); 
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error Jaringan',
+                        text: 'Terjadi kesalahan saat memproses permintaan.',
+                        showClass: { popup: 'animate__animated animate__shakeX' },
+                        hideClass: { popup: 'animate__animated animate__fadeOut' }
+                    });
+                })
+                .finally(() => { 
                     submitButton.innerHTML = originalButtonText;
                     submitButton.disabled = false;
                 });
             });
         }
     }
-
-    // =============================================
-    // --- LOGIKA MODAL TAMBAH KATEGORI ---
-    // =============================================
+ 
+    const allDeleteButtons = document.querySelectorAll('.btn-delete');
+    allDeleteButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault(); 
+            const id = this.getAttribute('data-id');
+            const keterangan = this.getAttribute('data-keterangan');
+            const table = this.getAttribute('data-table');  
+            
+            if (!id || !table) {
+                console.error("ID atau nama tabel tidak ditemukan di tombol.");
+                return;
+            } 
+            const deleteUrl = `pembukuan/proses_hapus.php?id=${id}&table=${table}`; 
+ 
+            Swal.fire({
+                title: 'Konfirmasi Soft Delete',
+                html: `Anda yakin ingin mengarsipkan data ${table}: <br><strong>"${keterangan}"</strong>? <br><small class="text-gray-500">(Data tidak akan dihapus permanen, hanya disembunyikan.)</small>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, Arsipkan!',  
+                cancelButtonText: 'Batal',
+                showClass: {  
+                    popup: 'animate__animated animate__fadeInDown'
+                },
+                hideClass: {  
+                    popup: 'animate__animated animate__fadeOutUp'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = deleteUrl;
+                }
+            });
+        });
+    });
+ 
     const kategoriModalOverlay = document.getElementById('kategori-modal-overlay');
     const kategoriModalCloseBtn = document.getElementById('kategori-modal-close');
     const kategoriForm = document.getElementById('form-tambah-kategori');
     const bukaKategoriModalBtn = document.getElementById('buka-modal-kategori-btn');
 
     function openModalKategori() {
-        // Menggunakan 'show' sesuai style.css
         if (kategoriModalOverlay) kategoriModalOverlay.classList.add('show');
     }
     function closeModalKategori() {
-        // Menggunakan 'show' sesuai style.css
         if (kategoriModalOverlay) kategoriModalOverlay.classList.remove('show');
         if (kategoriForm) kategoriForm.reset(); // Reset form saat ditutup
     }
@@ -187,7 +277,7 @@ document.addEventListener('DOMContentLoaded', function() {
         kategoriForm.addEventListener('submit', function(e) {
             e.preventDefault();
             const formData = new FormData(this);
-            const actionUrl = this.getAttribute('action'); // -> "pembukuan/proses_kategori.php"
+            const actionUrl = this.getAttribute('action'); 
             const submitButton = this.querySelector('button[type="submit"]');
             const originalButtonText = submitButton.innerHTML;
 
@@ -198,43 +288,91 @@ document.addEventListener('DOMContentLoaded', function() {
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.json()) // proses_kategori.php MENGEMBALIKAN JSON
+            .then(response => response.json()) 
             .then(data => {
                 if (data.status === 'success' && data.new_kategori) {
-                    closeModalKategori();
+                    closeModalKategori(); 
                     Swal.fire({
                         icon: 'success',
                         title: 'Berhasil!',
-                        text: 'Kategori baru berhasil ditambahkan.'
+                        text: 'Kategori baru berhasil ditambahkan.',
+                        showConfirmButton: false,  
+                        timer: 2000,
+                        showClass: { popup: 'animate__animated animate__bounceIn' },
+                        hideClass: { popup: 'animate__animated animate__fadeOut' }
+                    }).then(() => { 
+                        window.location.reload(); 
                     });
-
-                    // Buat opsi baru untuk dropdown
+ 
                     const newOption = new Option(data.new_kategori.nama_kategori, data.new_kategori.id_kategori);
-                    
+                     
                     const selectTambah = document.getElementById('tambah_kategori');
                     if (selectTambah) {
-                        selectTambah.appendChild(newOption);
-                        selectTambah.value = data.new_kategori.id_kategori; // Langsung pilih
+                        selectTambah.appendChild(newOption.cloneNode(true)); 
+                        selectTambah.value = data.new_kategori.id_kategori;  
                     }
-
-                } else {
+                    
+                } else { 
                     Swal.fire({
                         icon: 'error',
                         title: 'Gagal!',
-                        text: data.message || 'Tidak bisa menyimpan kategori.'
+                        text: data.message || 'Tidak bisa menyimpan kategori.',
+                        showClass: { popup: 'animate__animated animate__shakeX' },
+                        hideClass: { popup: 'animate__animated animate__fadeOut' }
                     });
                 }
             })
-            .catch(error => {
-                // FIX YANG DITERAPKAN: Mengubah Swal(...) menjadi Swal.fire(...)
-                Swal.fire('Error', 'Terjadi kesalahan jaringan.', 'error');
+            .catch(error => { 
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Terjadi kesalahan jaringan.',
+                    showClass: { popup: 'animate__animated animate__shakeX' },
+                    hideClass: { popup: 'animate__animated animate__fadeOut' }
+                });
                 console.error('Error:', error);
             })
-            .finally(() => {
-                // Kembalikan tombol ke kondisi semula
+            .finally(() => { 
                 submitButton.innerHTML = originalButtonText;
                 submitButton.disabled = false;
             });
+        });
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const status = urlParams.get('status');
+    
+    let title = '';
+    let text = '';
+    let icon = '';
+    let showSwal = false;
+
+    if (status === 'success') {
+        title = 'Berhasil!';
+        text = 'Data berhasil dihapus dari sistem.';
+        icon = 'success';
+        showSwal = true;
+    } else if (status === 'error_delete') {
+        title = 'Gagal!';
+        text = 'Terjadi kesalahan saat menghapus data. Silakan coba lagi.';
+        icon = 'error';
+        showSwal = true;
+    } else if (status === 'invalid_params' || status === 'missing_params') {
+        title = 'Peringatan!';
+        text = 'Parameter yang dikirim tidak valid atau hilang.';
+        icon = 'warning';
+        showSwal = true;
+    }
+
+    if (showSwal) {
+        Swal.fire({
+            title: title,
+            text: text,
+            icon: icon,
+            timer: 3000, 
+            showConfirmButton: false
+        }).then(() => {
+            history.replaceState(null, '', window.location.pathname + window.location.search.replace(/[\?&]status=[^&]*/, ""));
         });
     }
 });
